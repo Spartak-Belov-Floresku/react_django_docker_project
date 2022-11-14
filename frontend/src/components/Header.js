@@ -1,9 +1,9 @@
-import {Container, Navbar, Nav, Row} from "react-bootstrap";
+import {Container, Navbar, Nav, Row} from 'react-bootstrap'
 
 export default function Header() {
   return (
     <header>
-    <Navbar bg="light" expand="lg" collapseOnSelect>
+    <Navbar bg="light" expand="lg" collapseOnSelect fixed="top">
         <Container>
             <Navbar.Brand href="/">Play Game Ecommerce</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
