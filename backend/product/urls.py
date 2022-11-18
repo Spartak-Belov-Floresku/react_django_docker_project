@@ -1,15 +1,13 @@
 """
 URL mapping for product app.
 """
-from django.urls import (
-    path,
-    include,
-)
+from django.urls import path
 
-from product.views import ProductViewSet
+from product.views import *
 
 app_name = 'product'
 
 urlpatterns = [
-    path('', ProductViewSet.get_products, name='products'),
+    path('', getProducts, name='products'),
+    path('<str:pk>', getProduct, name='product'),
 ]

@@ -1,17 +1,18 @@
 """
 Views for the product APIs
 """
-from django.shortcuts import render
-from django.http import JsonResponse
-from rest_framework import viewsets
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from .products import products
 
+@api_view(['GET'])
+def getProducts(request):
+    return Response(products)
 
-class ProductViewSet(viewsets.ViewSet):
-
-    @api_view(['GET'])
-    def get_products(request):
-        return JsonResponse(products, safe=False)
+@api_view(['GET'])
+def getProduct(request, pk):
+    for i in products:
+        if i['_id'] == pk:
+            return Response(i)
 
