@@ -5,14 +5,14 @@ import { Link } from "react-router-dom"
 export default function Product({product}) {
   return (
     <Card className="my-3 p-3 rounded boxshadow opacity">
-      <Link to={`/product/${product._id}`}>
+      <Link to={`/product/${product.id}`}>
         <Card.Img src={product.image}/>
       </Link>
 
       <Card.Body>
-            <Link to={`/product/${product._id}`}>
+            <Link to={`/product/${product.id}`}>
                 <Card.Title as='span'>
-                    <strong>{product.name.length <= 26 
+                    <strong>{product.name.length <= 26
                                 ? product.name
                                 : product.name.substring(0,26) + '...' }</strong>
                 </Card.Title>
