@@ -13,6 +13,7 @@ export default function ProductScreen() {
 
     const [qty, setQty] = useState(1)
     const { productId } = useParams()
+    const navigate = useNavigate()
 
     const dispatch =  useDispatch()
 
@@ -26,6 +27,7 @@ export default function ProductScreen() {
 
     useEffect(() => { dispatch(listProductDetails(productId)) }, [productId])
 
+    const addToCartHandler = () => { navigate(`/cart/${productId}/${qty}`)}
 
     return (
         loading ?   <Loader/>
@@ -123,6 +125,7 @@ export default function ProductScreen() {
 
                                 <ListGroup.Item>
                                     <Button
+                                        onClick={addToCartHandler}
                                         className='btn-block bg-dark'
                                         style={{width: '100%'}}
                                         type='button'
