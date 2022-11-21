@@ -1,7 +1,9 @@
+import '../css/product.css'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { Row, Col, Image, ListGroup, Button, Card, Form } from 'react-bootstrap'
+import ReactImageMagnify from 'react-image-magnify'
 import Rating from '../components/Rating'
 import { listProductDetails } from '../actions/productActions'
 import Loader from '../components/Loader'
@@ -32,11 +34,23 @@ export default function ProductScreen() {
                         <Link to='/' className='btn btn-light my-3 rounded boxshadow'>Go Back</Link>
                         <Row>
 
-                        <Col md={6}>
-                            <Image src={product.image} alt={product.name} fluid className='boxshadow mb-3 rounded'/>
+                        <Col md={6} className='imageZoom'>
+                                      <ReactImageMagnify {...{
+                                          smallImage: {
+                                            src: `${product.image}`,
+                                            alt: product.name,
+                                            isFluidWidth: true,
+                                          },
+                                          largeImage: {
+                                            src: `${product.image}`,
+                                            width: 1000,
+                                            height: 900,
+                                            opacity:'.15s',
+                                          }
+                                      }} className='rounded boxshadow' />
                         </Col>
 
-                        <Col md={3}>
+                        <Col md={3} className='siblingOne'>
                             <ListGroup variant='flush'>
 
                                 <ListGroup.Item>
@@ -62,7 +76,7 @@ export default function ProductScreen() {
                             </ListGroup>
                         </Col>
 
-                        <Col md={3}>
+                        <Col md={3} className='siblingTwo'>
 
                             <Card>
                                 <ListGroup variant='flush'>

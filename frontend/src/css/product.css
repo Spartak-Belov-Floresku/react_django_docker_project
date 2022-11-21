@@ -1,0 +1,21 @@
+.textshadow{
+    text-shadow: 2px 2px 4px rgba(247, 241, 241, 0.7);
+}
+@media only screen and (min-width: 800px) {
+    .imageZoom:hover +.siblingOne,
+    .imageZoom:hover +.siblingOne +.siblingTwo{
+    opacity:0;
+    -khtml-opacity: 0;
+    -moz-opacity: 0;
+    filter: alpha(opacity=0);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    -webkit-transition: all .15s ease-in-out;
+    -moz-transition: all .15s ease-in-out;
+    -o-transition: all .15s ease-in-out;
+    -ms-transition: all .15s ease-in-out;
+    transition: all .15s ease-in-out;
+    }
+    .heightImg>a>.card-img{
+    max-height: 200px!important;
+    }
+}

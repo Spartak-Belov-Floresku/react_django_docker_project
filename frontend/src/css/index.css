@@ -1,83 +1,119 @@
 main{
-    min-height: 90vh;
+  min-height: 90vh;
+}
+
+h1{
+  font-size: 1.8rem;
+  padding:1rem 0;
+}
+
+h2{
+  font-size: 1.4rem;
+  padding:.5rem 0;
+}
+
+h3{
+  padding:1rem 0;
+}
+
+.rating span{
+  margin:.1rem;
+}
+
+.boxshadow{
+  -moz-box-shadow: 0 3px 9px 2px rgba(255, 255, 255, 0.2);
+  -webkit-box-shadow: 0 3px 9px 2px rgba(255, 255, 255, 0.2);
+  -o-box-shadow: 0 3px 9px 2px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 3px 9px 2px rgba(255, 255, 255, 0.2);
+}
+
+a.boxshadow:hover,
+div.boxshadow:hover,
+.dropdown-menu.show{
+  -moz-box-shadow: 0 1px 3px 0px rgba(255, 255, 255, 0.2);
+  -webkit-box-shadow: 0 1px 3px 0px rgba(255, 255, 255, 0.2);
+  -o-box-shadow: 0 1px 3px 0px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 1px 3px 0px rgba(255, 255, 255, 0.2);
+}
+
+.opacity{
+  -webkit-animation-name: fadeIn;
+  -webkit-animation-duration: .3s;
+  -moz-animation-name: fadeIn;
+  -moz-animation-duration: .3s;
+  -o-animation-name: fadeIn;
+  -o-animation-duration: .3s;
+  animation-name: fadeIn;
+  animation-duration: .3s;
+}
+
+/* carousel */
+.carousel{
+  background: rgba(0,0,0,.3);
+}
+.carousel-item-next,
+.carousel-item-prev,
+.carousel-item.active {
+  display: flex;
+}
+.carousel-caption {
+  position: absolute;
+  top: 0;
+}
+
+.carousel-caption h4 {
+  color: #fff;
+}
+
+.carousel img {
+  display:block;
+  height: 300px;
+  padding: 30px;
+  margin: 40px;
+  border-radius: 20%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.carousel a {
+  margin: 0 auto;
+}
+@media (max-width: 900px) {
+  .carousel-caption h2 {
+    font-size: 2.5vw;
   }
-  
-  h1{
-    font-size: 1.8rem;
-    padding:1rem 0;
-  }
-  
-  h2{
-    font-size: 1.4rem;
-    padding:.5rem 0;
-  }
-  
-  h3{
-    padding:1rem 0;
-  }
-  
-  .rating span{
-    margin:.1rem;
-  }
-  
-  .boxshadow{
-    -moz-box-shadow: 0 3px 9px 2px rgba(255, 255, 255, 0.2);
-    -webkit-box-shadow: 0 3px 9px 2px rgba(255, 255, 255, 0.2);
-    -o-box-shadow: 0 3px 9px 2px rgba(255, 255, 255, 0.2);
-    box-shadow: 0 3px 9px 2px rgba(255, 255, 255, 0.2);
-  }
-  
-  a.boxshadow:hover,
-  div.boxshadow:hover,
-  .dropdown-menu.show{
-    -moz-box-shadow: 0 1px 3px 0px rgba(255, 255, 255, 0.2);
-    -webkit-box-shadow: 0 1px 3px 0px rgba(255, 255, 255, 0.2);
-    -o-box-shadow: 0 1px 3px 0px rgba(255, 255, 255, 0.2);
-    box-shadow: 0 1px 3px 0px rgba(255, 255, 255, 0.2);
-  }
-  
-  .opacity{
-    -webkit-animation-name: fadeIn;
-    -webkit-animation-duration: .3s;
-    -moz-animation-name: fadeIn;
-    -moz-animation-duration: .3s;
-    -o-animation-name: fadeIn;
-    -o-animation-duration: .3s;
-    animation-name: fadeIn;
-    animation-duration: .3s;
-  }
-  @-webkit-keyframes fadeIn { 
-    0% { opacity: 0; }
-    20% { opacity: 0; }
-    40% { opacity: 0.3; }
-    60% { opacity: 0.5; }
-    80% { opacity: 0.9; }
-    100% { opacity: 1; }
-  }
-  
-  @-moz-keyframes fadeIn { 
-    0% { opacity: 0; }
-    20% { opacity: 0; }
-    40% { opacity: 0.3; }
-    60% { opacity: 0.5; }
-    80% { opacity: 0.9; }
-    100% { opacity: 1; }
-  }
-  
-  @-o-keyframes fadeIn { 
-    0% { opacity: 0; }
-    20% { opacity: 0; }
-    40% { opacity: 0.3; }
-    60% { opacity: 0.5; }
-    80% { opacity: 0.9; }
-    100% { opacity: 1; }
-  }
-  
-  @keyframes fadeIn {
-    0% { opacity: 0; }
-    20% { opacity: 0; }
-    40% { opacity: 0.3; }
-    60% { opacity: 0.5; }
-    80% { opacity: 0.9; }
-    100% { opacity: 1; }
-  }
+}
+@-webkit-keyframes fadeIn {
+  0% { opacity: 0; }
+  20% { opacity: 0; }
+  40% { opacity: 0.3; }
+  60% { opacity: 0.5; }
+  80% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+@-moz-keyframes fadeIn {
+  0% { opacity: 0; }
+  20% { opacity: 0; }
+  40% { opacity: 0.3; }
+  60% { opacity: 0.5; }
+  80% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+@-o-keyframes fadeIn {
+  0% { opacity: 0; }
+  20% { opacity: 0; }
+  40% { opacity: 0.3; }
+  60% { opacity: 0.5; }
+  80% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  20% { opacity: 0; }
+  40% { opacity: 0.3; }
+  60% { opacity: 0.5; }
+  80% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
