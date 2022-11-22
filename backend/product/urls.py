@@ -9,5 +9,5 @@ app_name = 'product'
 
 urlpatterns = [
     path('', getProducts, name='products'),
-    path('<str:pk>', getProduct, name='product'),
+    path('<str:pk>/', getProduct, name='product'),
 ]

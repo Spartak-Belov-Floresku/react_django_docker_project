@@ -16,14 +16,14 @@ export default function CartScreen() {
 
   useEffect(() => {
     if(productId){
-      // dispatch(addToCart(productId, qty))
+      dispatch(addToCart(productId, qty))
     }else if(cartItems){
-      // cartItems.map(item => dispatch(addToCart(item.product, item.qty)))
+      cartItems.map(item => dispatch(addToCart(item.product, item.qty)))
     }
   }, [dispatch, productId, qty])
 
   const removeFromCartHandler = id => {
-    // dispatch(removeFromCart(id))
+    dispatch(removeFromCart(id))
   }
 
   const checkOutHandler = () => {
@@ -57,7 +57,7 @@ export default function CartScreen() {
                         <Form.Control
                           as="select"
                           value={item.qty}
-                          // onChange={e=> dispatch(addToCart(item.product, Number(e.target.value)))}
+                          onChange={e=> dispatch(addToCart(item.product, Number(e.target.value)))}
                         >
                           {
                             [...Array(item.countInStock).keys()]
@@ -97,10 +97,10 @@ export default function CartScreen() {
           </ListGroup>
 
           <ListGroup.Item className='p-2'>
-            <Button 
+            <Button
               onClick={checkOutHandler}
               className='btn-block bg-dark'
-              style={{width: '100%'}} 
+              style={{width: '100%'}}
               type='button'
               disabled={!cartItems.length}>
                 Proceed to Checkout

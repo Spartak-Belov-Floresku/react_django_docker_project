@@ -1,9 +1,8 @@
-import {useEffect, useState} from 'react'
-import { 
-  BrowserRouter as Router, 
-  Routes, 
-  Route, 
-  Navigate 
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate
 } from 'react-router-dom'
 import {Container} from 'react-bootstrap'
 
