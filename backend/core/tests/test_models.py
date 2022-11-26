@@ -74,6 +74,7 @@ class ModelTests(TestCase):
     def test_create_product(self):
         """Test creating a product is successful."""
         user = create_user()
+
         product = models.Product.objects.create(
             user=user,
             name='Sample product name',
@@ -96,6 +97,7 @@ class ModelTests(TestCase):
         """Test creating a product's review is successful."""
         user = create_user()
         product = create_product(user)
+
         review = models.Review.objects.create(
             user=user,
             product=product,
@@ -111,12 +113,7 @@ class ModelTests(TestCase):
     def test_create_order(self):
         """Test creating an order is successful."""
         user = create_user()
-        order = models.Order.objects.create(
-            user=user,
-            paymentMethod='PayPal',
-            shippingPrice=Decimal('2'),
-            totalPrice=Decimal('5')
-        )
+        order = create_order(user)
 
         self.assertTrue(user.order_set.filter(createdAt=order.createdAt).exists())
         self.assertTrue(models.Order.objects.filter(user__id=user.id).count()==1)
@@ -126,12 +123,8 @@ class ModelTests(TestCase):
         """Test creating an order item is successful."""
         user = create_user()
         product = create_product(user)
-        order = models.Order.objects.create(
-            user=user,
-            paymentMethod='PayPal',
-            shippingPrice=Decimal('2'),
-            totalPrice=Decimal('5')
-        )
+        order = create_order(user)
+
         models.OrderItem.objects.create(
             product=product,
             order=order,
@@ -146,18 +139,15 @@ class ModelTests(TestCase):
     def test_create_shipping_address(self):
         """Test creating a shipping address is successful."""
         user = create_user()
-        order = models.Order.objects.create(
-            user=user,
-            paymentMethod='PayPal',
-            shippingPrice=Decimal('2'),
-            totalPrice=Decimal('5')
-        )
+        order = create_order(user)
+
         shipping_address = models.ShippingAddress.objects.create(
             order=order,
             address='The First Street',
             city='Mars',
             zipCode='00001'
         )
+
         self.assertEqual(models.ShippingAddress.objects.get(id=order.shippingaddress.id).address, shipping_address.address)
         self.assertTrue(models.ShippingAddress.objects.get(order=user.order_set.filter(createdAt=order.createdAt)[0]).address == shipping_address.address)
 
