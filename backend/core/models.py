@@ -8,6 +8,7 @@ import os
 from django.db import models
 from django.contrib.auth.models import User
 
+
 def products_image_file_path(instance, filename):
     """Generate file path for new product image."""
     ext = os.path.splitext(filename)[1]
@@ -15,7 +16,9 @@ def products_image_file_path(instance, filename):
 
     return os.path.join('products', filename)
 
+
 class Product(models.Model):
+    """Product object."""
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=200, null=True, blank=True)
     image = models.ImageField(null=True, blank=True, upload_to=products_image_file_path, default='/sample.jpg')
@@ -33,6 +36,7 @@ class Product(models.Model):
 
 
 class Review(models.Model):
+    """Reveiw for products."""
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=200, null=True, blank=True)
@@ -45,6 +49,7 @@ class Review(models.Model):
 
 
 class Order(models.Model):
+    """Order for user."""
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     paymentMethod = models.CharField(max_length=200, null=True, blank=True)
     shippingPrice = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
@@ -59,6 +64,7 @@ class Order(models.Model):
         return str(f'id: {self.id}, created: {self.createdAt}')
 
 class OrderItem(models.Model):
+    """OrderItem for product."""
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=200, null=True, blank=True)
@@ -71,6 +77,7 @@ class OrderItem(models.Model):
 
 
 class ShippingAddress(models.Model):
+    """Shipping address for orders."""
     order = models.OneToOneField(Order, on_delete=models.CASCADE, null=True, blank=True)
     address = models.CharField(max_length=200, null=True, blank=True)
     city = models.CharField(max_length=200, null=True, blank=True)
