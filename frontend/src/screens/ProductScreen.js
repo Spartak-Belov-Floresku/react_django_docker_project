@@ -49,7 +49,7 @@ export default function ProductScreen() {
                                             height: 900,
                                             opacity:'.15s',
                                           }
-                                      }} className='rounded boxshadow' />
+                                      }} />
                         </Col>
 
                         <Col md={3} className='siblingOne'>

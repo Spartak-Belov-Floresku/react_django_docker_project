@@ -1,5 +1,5 @@
 """
-Tests for the products API.
+Tests for the product API.
 """
 from decimal import Decimal
 
