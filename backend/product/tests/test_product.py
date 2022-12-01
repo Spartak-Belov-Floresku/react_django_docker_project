@@ -15,13 +15,12 @@ from core.models import Product
 from product.serializers import ProductSerializer
 
 
-PRODUCT_URL = reverse('product:products')
+ALL_PRODUCTS_URL = reverse('product:products')
+PRRODUCT_DETAIL_URL = reverse('product:products')
 
 def detail_url(product_id):
-    """Create and return a product detail url."""
+    """Return a product detail url."""
     return reverse('product:products:', args=[product_id])
-
-
 
 def create_user(admin=False, **params):
     """Create and return a new user."""
@@ -58,9 +57,9 @@ class ProductAPITests(TestCase):
         self.user = create_user()
         self.product = create_product(self.user)
 
-    def test_retrive_recipes(self):
+    def test_retrive_products(self):
         """Test retrieving a list of products."""
-        res = self.client.get(PRODUCT_URL)
+        res = self.client.get(ALL_PRODUCTS_URL)
         products = Product.objects.all().order_by('-id')
         serializer = ProductSerializer(products, many=True)
 
@@ -68,9 +67,9 @@ class ProductAPITests(TestCase):
         self.assertEqual(res.data, serializer.data)
 
 
-    def test_update_tag(self):
-        """Testing the receipt of a specific product."""
-        res = self.client.get(f'{PRODUCT_URL}{self.product.id}/')
+    def test_get_product(self):
+        """Testing the reciving of a specific product."""
+        res = self.client.get(f'{PRRODUCT_DETAIL_URL}{self.product.id}/')
 
         serializer = ProductSerializer(self.product, many=False)
 
