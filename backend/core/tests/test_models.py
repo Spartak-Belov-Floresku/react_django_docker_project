@@ -26,7 +26,7 @@ def create_user(admin=False, **params):
         return User.objects.create_superuser(**defaults)
 
 def create_product(user):
-    """Create and return a product"""
+    """Create and return a product."""
     product = models.Product.objects.create(
         user=user,
         name='Sample product name',
@@ -36,7 +36,7 @@ def create_product(user):
     return product
 
 def create_order(user):
-    """Create and return an oredr"""
+    """Create and return an oredr."""
     order = models.Order.objects.create(
             user=user,
             paymentMethod='PayPal',
