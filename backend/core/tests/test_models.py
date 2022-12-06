@@ -58,6 +58,7 @@ class ModelTests(TestCase):
         self.assertEquals(user.email, email)
         self.assertTrue(user.check_password(password))
 
+
     def test_new_user_email_normalized(self):
         """Test email is normalized for new users."""
         sample_email = [
@@ -71,10 +72,10 @@ class ModelTests(TestCase):
             user = create_user(username=expected, email=email)
             self.assertEqual(user.email, expected)
 
+
     def test_create_product(self):
         """Test creating a product is successful."""
         user = create_user()
-
         product = models.Product.objects.create(
             user=user,
             name='Sample product name',
@@ -93,11 +94,11 @@ class ModelTests(TestCase):
 
         self.assertEqual(file_path, f'products/{uuid}.jpg')
 
+
     def test_create_review(self):
         """Test creating a product's review is successful."""
         user = create_user()
         product = create_product(user)
-
         review = models.Review.objects.create(
             user=user,
             product=product,
@@ -105,10 +106,12 @@ class ModelTests(TestCase):
             rating=5,
             comment='test comment'
         )
+
         self.assertEqual(review.user, user)
         self.assertEqual(review.product, product)
         self.assertTrue(user.review_set.filter(product=product).exists())
         self.assertTrue(product.review_set.filter(user=user).exists())
+
 
     def test_create_order(self):
         """Test creating an order is successful."""
@@ -119,12 +122,12 @@ class ModelTests(TestCase):
         self.assertTrue(models.Order.objects.filter(user__id=user.id).count()==1)
         self.assertTrue(models.Order.objects.get(id=user.order_set.filter(createdAt=order.createdAt)[0].id))
 
+
     def test_create_order_item(self):
         """Test creating an order item is successful."""
         user = create_user()
         product = create_product(user)
         order = create_order(user)
-
         models.OrderItem.objects.create(
             product=product,
             order=order,
@@ -136,11 +139,11 @@ class ModelTests(TestCase):
         self.assertTrue(product.orderitem_set.filter(name=product.name).exists())
         self.assertTrue(order.orderitem_set.filter(order__id=user.order_set.filter(createdAt=order.createdAt)[0].id).exists())
 
+
     def test_create_shipping_address(self):
         """Test creating a shipping address is successful."""
         user = create_user()
         order = create_order(user)
-
         shipping_address = models.ShippingAddress.objects.create(
             order=order,
             address='The First Street',

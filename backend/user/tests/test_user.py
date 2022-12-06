@@ -40,6 +40,7 @@ class UserAPITests(TestCase):
         }
         self.user = create_user(self.payload)
 
+
     def test_create_user_success(self):
         """Test creating a new user."""
         payload = {
@@ -47,14 +48,27 @@ class UserAPITests(TestCase):
             'email': 'test2@mail.com',
             'password': 'password123',
         }
-
         res = self.client.post(REGESTER_USER_URL, payload, format='json')
-
         user = User.objects.get(email__exact=payload['email'])
         serializer = UserSerializer(user, many=False)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(serializer.data['id'], res.data['id'])
+    
+
+    def test_password_too_short_error(self):
+        """Test an error is returned if password less than 8 chars."""
+        payload = {
+            'email': 'test3@mail.com',
+            'password': 'pw',
+            'name': 'Test Name',
+        }
+        res = self.client.post(REGESTER_USER_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        user_exists = User.objects.filter(email=payload['email']).exists()
+        self.assertFalse(user_exists)
+
 
     def test_create_user_with_email_already_exists(self):
         """Test creating user with email that already exists"""
@@ -70,9 +84,9 @@ class UserAPITests(TestCase):
         self.assertIn('token', res.data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
+
     def test_create_token_bad_credentials(self):
         """Test returns error if credentials invalid."""
-
         payload = {
             'email': 'none@mail.com',
             'password': 'testpassword',
@@ -105,6 +119,7 @@ class UserAPITests(TestCase):
             'isAdmin': False
         })
 
+
     def test_retrieve_profile_for_admin_user_success(self):
         """Test retrieving admin profile for valid token in user."""
         payload = {
@@ -114,10 +129,8 @@ class UserAPITests(TestCase):
                 'password': 'password123',
             }
         admin_user = create_user(payload, True)
-
         res1 = get_token(self.client.post, payload)
         token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
-
         res2 = self.client.get(PROFILE_URL, **token)
 
         self.assertEqual(res2.status_code, status.HTTP_200_OK)
@@ -129,6 +142,7 @@ class UserAPITests(TestCase):
             'isAdmin': True
         })
 
+
     def test_retrieve_all_users_success(self):
         """Test retrieving profiles for all users using a valid admin token."""
         payload = {
@@ -139,21 +153,18 @@ class UserAPITests(TestCase):
             }
         create_user(payload, True)
         users = User.objects.all()
-
         res1 = get_token(self.client.post, payload)
         token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
-
         res2 = self.client.get(PROFILE_ALL_USERS_URL, **token)
 
         self.assertEqual(res2.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res2.data), len(users))
 
+
     def test_unathorized_retrieve_all_users(self):
         """Test returns error if credentials invalid for admin."""
-
         res1 = get_token(self.client.post, self.payload)
         token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
-
         res2 = self.client.get(PROFILE_ALL_USERS_URL, **token)
 
         self.assertEqual(res2.status_code, status.HTTP_403_FORBIDDEN)

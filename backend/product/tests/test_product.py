@@ -70,7 +70,6 @@ class ProductAPITests(TestCase):
     def test_get_product(self):
         """Testing the reciving of a specific product."""
         res = self.client.get(f'{PRRODUCT_DETAIL_URL}{self.product.id}/')
-
         serializer = ProductSerializer(self.product, many=False)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)

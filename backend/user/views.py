@@ -39,6 +39,9 @@ class MyTokenObtainPairView(TokenObtainPairView):
 def registerUser(request):
     data = request.data
     try:
+        if len(data['password']) < 8:
+            message = {'detail': 'Password is too short.'}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.create(
             first_name=data['name'],
             email=data['email'],
