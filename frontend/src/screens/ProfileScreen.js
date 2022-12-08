@@ -44,7 +44,6 @@ export default function ProfileScreen() {
                 setEmail(userProfile.email)
             }
         }
-        console.log(errorProfile)
 
         if(errorProfile == 'Given token not valid for any token type')
             dispatch(logout())
