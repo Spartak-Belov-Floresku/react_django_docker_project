@@ -2,6 +2,7 @@
 Tests for the user API.
 """
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 from django.test import TestCase
 
@@ -50,15 +51,14 @@ class UserAPITests(TestCase):
             'password': 'password123',
         }
         res = self.client.post(REGESTER_USER_URL, payload, format='json')
-        user = User.objects.get(email__exact=payload['email'])
-        serializer = UserSerializer(user, many=False)
+        user_exists = User.objects.filter(email__exact=payload['email']).exists()
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(serializer.data['id'], res.data['id'])
+        self.assertTrue(user_exists)
 
 
-    def test_create_user_wrong_email(self):
-        """Test creating a new user with a bad email."""
+    def test_create_user_invalid_email(self):
+        """Test creating a new user with an invalid email."""
         payload = {
             'name': 'Name',
             'email': 'some_email',
@@ -73,8 +73,8 @@ class UserAPITests(TestCase):
         """Test an error is returned if password less than 8 chars."""
         payload = {
             'email': 'test3@mail.com',
-            'password': 'pw',
             'name': 'Test Name',
+            'password': 'short',
         }
         res = self.client.post(REGESTER_USER_URL, payload)
         user_exists = User.objects.filter(email=payload['email']).exists()
@@ -99,7 +99,7 @@ class UserAPITests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
 
-    def test_create_token_bad_credentials(self):
+    def test_create_token_invalid_credentials(self):
         """Test returns error if credentials invalid."""
         payload = {
             'email': 'none@mail.com',
@@ -130,8 +130,41 @@ class UserAPITests(TestCase):
         self.assertEqual(res.data['id'], serializer.data['id'])
         self.assertNotEqual(res.data['email'], self.payload['email'])
     
-    def test_update_user_profile_with_bad_email(self):
-        """Test update user profile with a bad email."""
+
+    def test_update_user_profile_password_success(self):
+        """Test update user profile and password."""
+        res = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {res.data.get("token")}'}
+        payload= {
+            'email': 'update@email.com',
+            'name': 'Update Name',
+            'password': 'password123Updated'
+        }
+
+        res = self.client.put(UPDATE_PROFILE_URL, payload, **token, format='json')
+        user = User.objects.get(email__exact=payload['email'])
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(user.password, make_password(payload['password']))
+    
+
+    def test_update_user_profile_with_short_password(self):
+        """Test an error is returned if password less than 8 chars."""
+        res = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {res.data.get("token")}'}
+        payload= {
+            'email': 'test_password@mail.com',
+            'name': 'Update Name',
+            'password': 'short'
+        }
+
+        res = self.client.put(UPDATE_PROFILE_URL, payload, **token, format='json')
+    
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_update_user_profile_with_invalid_email(self):
+        """Test update user profile with an invalid email."""
         res = get_token(self.client.post, self.payload)
         token = {'HTTP_AUTHORIZATION': f'Bearer {res.data.get("token")}'}
         payload= {
@@ -143,6 +176,7 @@ class UserAPITests(TestCase):
         res = self.client.put(UPDATE_PROFILE_URL, payload, **token, format='json')
     
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
 
     def test_unathorized_update_user_profile(self):
         """Test unathorized update user profile."""

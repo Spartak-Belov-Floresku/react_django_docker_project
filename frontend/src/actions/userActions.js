@@ -137,7 +137,7 @@ export const getUserDetails = request => async (dispatch, getState) => {
 
         const config = {
             headers: {
-                'Content-type':'application/json',
+                'Content-Type':'application/json',
                 AUthorization: `Bearer ${userInfo.token}`,
             }
         }
@@ -175,7 +175,7 @@ export const updateUserProfile = user => async (dispatch, getState) => {
 
         const config = {
             headers: {
-                'Content-type':'application/json',
+                'Content-Type':'application/json',
                 AUthorization: `Bearer ${userInfo.token}`,
             }
         }
@@ -221,7 +221,7 @@ export const listUsers = () => async (dispatch, getState) => {
 
         const config = {
             headers: {
-                'Content-type':'application/json',
+                'Content-Type':'application/json',
                 AUthorization: `Bearer ${userInfo.token}`,
             }
         }
@@ -259,7 +259,7 @@ export const deleteUser = id => async (dispatch, getState) => {
 
         const config = {
             headers: {
-                'Content-type':'application/json',
+                'Content-Type':'application/json',
                 AUthorization: `Bearer ${userInfo.token}`,
             }
         }
@@ -296,7 +296,7 @@ export const updateUser = user => async (dispatch, getState) => {
 
         const config = {
             headers: {
-                'Content-type':'application/json',
+                'Content-Type':'application/json',
                 AUthorization: `Bearer ${userInfo.token}`,
             }
         }

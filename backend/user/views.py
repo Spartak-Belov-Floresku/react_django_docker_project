@@ -7,10 +7,19 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.hashers import make_password
 from django.core.validators import validate_email
+# from django.contrib.auth.password_validation import validate_password
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from user.serializers import *
+
+
+def validate_password(password):
+    """Function validates user password."""
+    if len(password) < 8:
+        return False, {'detail':'Password is too short!'}
+    else:
+        return True, {}
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -44,10 +53,12 @@ def registerUser(request):
             validate_email(data['email'])
         except:
             message = {'detail': 'Enter a valid email address.'}
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)         
-        if len(data['password']) < 8:
-            message = {'detail': 'Password is too short.'}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+        password, message = validate_password(data['password'])
+        if not password:
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        
         user = User.objects.create(
             first_name=data['name'],
             email=data['email'],
@@ -67,6 +78,7 @@ def getUserProfile(request):
     serializer = UserSerializer(user, many=False)
     return Response(serializer.data)
 
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateUserProfile(request):
@@ -81,9 +93,9 @@ def updateUserProfile(request):
     user.first_name = data['name']
     user.username = data['email']
     user.email = data['email']
-    if data['password']:
-        if len(data['password']) < 8:
-            message = {'detail': 'Password is too short.'}
+    if len(data['password']) > 0:
+        password, message = validate_password(data['password'])
+        if not password:
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
         user.password = make_password(data['password'])
     user.save()
