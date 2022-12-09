@@ -15,6 +15,7 @@ import CartScreen from './screens/CartScreen'
 import LoginScreen from './screens/LoginScreen'
 import RegisterScreen from './screens/RegisterScreen'
 import ProfileScreen from './screens/ProfileScreen'
+import ShippingScreen from './screens/ShippingScreen'
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route exact path='/register' element={<RegisterScreen />} />
           <Route path='/register/:redirect' element={<RegisterScreen />} />
           <Route path='/profile' element={<ProfileScreen />} />
+          <Route path='/shipping' element={<ShippingScreen />} />
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -79,6 +79,41 @@ def getUserProfile(request):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getUserAddress(request):
+    user = request.user
+    address = UserAddress.objects.get(user__id=user.id)
+    serializer = UserAddressSerializer(address, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def createUserAddress(request):
+    user = request.user
+    data = request.data
+    address = UserAddress.objects.filter(user__id=user.id).exists()
+    if not address:
+        user_address=UserAddress.objects.create(
+            user=user,
+            address=data['address'],
+            city=data['city'],
+            zipCode=data['zipCode'],
+            )
+        serializer = UserAddressSerializer(user_address, many=False)
+        return Response(serializer.data)
+    else:
+        user_address=UserAddress.objects.get(user__id=user.id)
+        user_address.address=data['address']
+        user_address.city=data['city']
+        user_address.zipCode=data['zipCode']
+        user_address.save()
+        user_address.refresh_from_db()
+        serializer = UserAddressSerializer(user_address, many=False)
+        return Response(serializer.data)
+
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateUserProfile(request):

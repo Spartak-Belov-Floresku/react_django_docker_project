@@ -85,3 +85,13 @@ class ShippingAddress(models.Model):
 
     def __str__(self):
         return str(self.address)
+
+class UserAddress(models.Model):
+    """User address for orders."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    address = models.CharField(max_length=200, null=True, blank=True)
+    city = models.CharField(max_length=200, null=True, blank=True)
+    zipCode = models.CharField(max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.user.first_name)
