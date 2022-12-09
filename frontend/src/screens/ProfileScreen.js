@@ -10,7 +10,7 @@ import { USER_UPDATE_PROFILE_RESET } from '../constants/userConstants'
 // import { listMyOrders } from '../actions/orderActions'
 
 export default function ProfileScreen() {
-    
+
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -28,10 +28,8 @@ export default function ProfileScreen() {
     let listOrders = []
     let errorOrders = ''
     useEffect(() => {
-        console.log(userInfo)
         if(!userInfo){
-            //navigate(`/login`)
-           
+            navigate(`/login`)
         }else{
             if(!userProfile || !userProfile.name || success || userInfo.id !== userProfile.id){
                 dispatch({type: USER_UPDATE_PROFILE_RESET})
@@ -40,23 +38,23 @@ export default function ProfileScreen() {
                 setPassword('')
                 setConfirmPassword('')
             }else{
-                setName(userProfile.name) 
+                setName(userProfile.name)
                 setEmail(userProfile.email)
             }
         }
 
         if(errorProfile == 'Given token not valid for any token type')
             dispatch(logout())
-  
+
     }, [dispatch, userInfo, userProfile, success, loadingOrders])
 
     const submitHandler = e => {
         e.preventDefault()
-        if(password != confirmPassword) 
+        if(password != confirmPassword){
             setMessage('Passwords do not match')
-        else if(password.length < 8 && password.length)
+        }else if(password.length < 8 && password.length){
             setMessage('Passwords must be at least 8 characters')
-        else
+        }else{
             dispatch(updateUserProfile({
                 'id': userProfile.id,
                 'name': name,
@@ -66,8 +64,9 @@ export default function ProfileScreen() {
             setMessage('');
             setPassword('');
             setConfirmPassword('');
+        }
     }
-    
+
   return (
     <Row>
         <Col md={3}>
@@ -124,11 +123,11 @@ export default function ProfileScreen() {
                 </Form.Group>
 
                 <Button
-                    className='mt-2' 
+                    className='mt-2'
                     type='submit'
                     variant='primary'>
                         Update
-                </Button> 
+                </Button>
 
             </Form>
         </Col>

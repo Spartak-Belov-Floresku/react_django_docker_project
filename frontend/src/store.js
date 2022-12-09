@@ -36,7 +36,8 @@ const reducer = combineReducers({
 const initialState = {
     cart: {
         cartItems: localStorage.getItem('cartItems')? JSON.parse(localStorage.getItem('cartItems')): [],
-    }
+    },
+    userLogin: {userInfo: localStorage.getItem('userInfo')? JSON.parse(localStorage.getItem('userInfo')): null},
 }
 
 const mmiddleware = [thunk]
