@@ -73,7 +73,7 @@ class UserAPITests(TestCase):
         res = self.client.post(REGESTER_USER_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
 
     def test_password_too_short_error(self):
         """Test an error is returned if password less than 8 chars."""
@@ -131,11 +131,11 @@ class UserAPITests(TestCase):
 
         user = User.objects.get(email__exact=payload['email'])
         serializer = UserSerializer(user, many=False)
-    
+
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data['id'], serializer.data['id'])
         self.assertNotEqual(res.data['email'], self.payload['email'])
-    
+
 
     def test_update_user_profile_password_success(self):
         """Test update user profile and password."""
@@ -152,7 +152,7 @@ class UserAPITests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(user.password, make_password(payload['password']))
-    
+
 
     def test_update_user_profile_with_short_password(self):
         """Test an error is returned if password less than 8 chars."""
@@ -165,7 +165,7 @@ class UserAPITests(TestCase):
         }
 
         res = self.client.put(UPDATE_PROFILE_URL, payload, **token, format='json')
-    
+
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -180,7 +180,7 @@ class UserAPITests(TestCase):
         }
 
         res = self.client.put(UPDATE_PROFILE_URL, payload, **token, format='json')
-    
+
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -192,7 +192,7 @@ class UserAPITests(TestCase):
             'password': ''
         }
         res = self.client.put(UPDATE_PROFILE_URL, payload, format='json')
-    
+
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -286,6 +286,16 @@ class UserAPITests(TestCase):
 
         self.assertEqual(res2.status_code, status.HTTP_200_OK)
         self.assertEqual(res2.data['address'], user_address.address)
+
+
+    def test_get_user_address_unsuccess(self):
+        """Test get address not exists."""
+
+        res1 = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
+        res2 = self.client.get(GET_USER_ADDRESS, **token)
+
+        self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
 
 
     def test_create_user_address(self):

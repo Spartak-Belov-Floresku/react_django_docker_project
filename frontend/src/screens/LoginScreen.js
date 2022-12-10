@@ -15,7 +15,6 @@ export default function LoginScreen() {
 
     let { redirect } = useParams()
     const navigate = useNavigate()
-    console.log(redirect)
 
     const {error, loading, userInfo } = useSelector(state => state.userLogin)
 

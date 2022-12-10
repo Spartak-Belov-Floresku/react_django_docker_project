@@ -15,6 +15,11 @@ import {
     USER_DETAILS_FAIL,
     USER_DETAILS_RESET,
 
+    USER_ADDRESS_DETAILS_REQUEST,
+    USER_ADDRESS_DETAILS_SUCCESS,
+    USER_ADDRESS_DETAILS_FAIL,
+    USER_ADDRESS_DETAILS_RESET,
+
     USER_UPDATE_PROFILE_REQUEST,
     USER_UPDATE_PROFILE_SUCCESS,
     USER_UPDATE_PROFILE_FAIL,
@@ -32,6 +37,10 @@ import {
     USER_UPDATE_SUCCESS,
     USER_UPDATE_FAIL,
 } from '../constants/userConstants'
+import {
+    CART_CLEAR_ITEMS,
+    CART_SAVE_SHIPPING_ADDRESS
+} from '../constants/cartConstants'
 //import { ORDER_LIST_MY_RESET } from '../constants/orderConstants';
 
 export const login = (email, password) => async (dispatch) => {
@@ -74,8 +83,12 @@ export const login = (email, password) => async (dispatch) => {
 
 export const logout = () => (dispatch) => {
     localStorage.removeItem('userInfo')
+    localStorage.removeItem('cartItems')
+    localStorage.removeItem('shippingAddress')
     dispatch({type: USER_LOGOUT})
     dispatch({type: USER_DETAILS_RESET})
+    dispatch({type: USER_ADDRESS_DETAILS_RESET})
+    dispatch({type: CART_CLEAR_ITEMS})
     dispatch({type: USER_LIST_RESET})
     //dispatch({type: ORDER_LIST_MY_RESET})
 }
@@ -160,6 +173,93 @@ export const getUserDetails = request => async (dispatch, getState) => {
                         : error.message,
 
         })
+    }
+}
+
+export const getUserAddressDetails = () => async (dispatch, getState) => {
+    try{
+        dispatch({
+            type: USER_ADDRESS_DETAILS_REQUEST,
+        })
+
+        const {
+            userLogin:{ userInfo }
+        } = getState()
+
+        const config = {
+            headers: {
+                'Content-Type':'application/json',
+                AUthorization: `Bearer ${userInfo.token}`,
+            }
+        }
+
+        const {data} = await axios.get(
+                `/api/users/address/`,
+                config,
+            );
+
+        dispatch({
+            type: USER_ADDRESS_DETAILS_SUCCESS,
+            payload: data,
+        })
+
+        dispatch({
+            type: CART_SAVE_SHIPPING_ADDRESS,
+            payload: data,
+        })
+
+        localStorage.setItem('shippingAddress', JSON.stringify(data))
+
+    }catch(error){
+        dispatch({
+            type    : USER_ADDRESS_DETAILS_FAIL,
+            payload : error.response && error.response.data.detail
+                        ? error.response.data.detail
+                        : error.message,
+
+        })
+    }
+}
+
+export const saveShippingAddress = userAddress => async (dispatch, getState) => {
+
+    try{
+
+        const {
+            userLogin:{ userInfo }
+        } = getState()
+
+        const config = {
+            headers: {
+                'Content-Type':'application/json',
+                AUthorization: `Bearer ${userInfo.token}`,
+            }
+        }
+
+        const {data} = await axios.post(
+                `/api/users/address/create/`,
+                {
+                    'address': userAddress['address'],
+                    'city': userAddress['city'],
+                    'zipCode': userAddress['zipCode'],
+                },
+                config,
+            );
+
+        dispatch({
+            type: CART_SAVE_SHIPPING_ADDRESS,
+            payload: userAddress,
+        })
+
+        localStorage.setItem('shippingAddress', JSON.stringify(data))
+
+    }catch(error){
+        dispatch({
+                type    : USER_ADDRESS_DETAILS_FAIL,
+                payload : error.response && error.response.data.detail
+                            ? error.response.data.detail
+                            : error.message,
+            })
     }
 }
 

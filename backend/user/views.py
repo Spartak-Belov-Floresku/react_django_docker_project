@@ -58,7 +58,7 @@ def registerUser(request):
         password, message = validate_password(data['password'])
         if not password:
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
-        
+
         user = User.objects.create(
             first_name=data['name'],
             email=data['email'],
@@ -83,9 +83,13 @@ def getUserProfile(request):
 @permission_classes([IsAuthenticated])
 def getUserAddress(request):
     user = request.user
-    address = UserAddress.objects.get(user__id=user.id)
-    serializer = UserAddressSerializer(address, many=False)
-    return Response(serializer.data)
+    try:
+        address = UserAddress.objects.get(user__id=user.id)
+        serializer = UserAddressSerializer(address, many=False)
+        return Response(serializer.data)
+    except:
+        message = {'detail': 'The user doesn\'t have an address.'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -134,7 +138,7 @@ def updateUserProfile(request):
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
         user.password = make_password(data['password'])
     user.save()
-    
+
     return Response(serializer.data)
 
 

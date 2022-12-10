@@ -44,6 +44,7 @@ export const cartRuducers = (state = { cartItems: [], shippingAddress: {}}, acti
             return{
                 ...state,
                 cartItems:[],
+                shippingAddress:{},
             }
         default:
             return state

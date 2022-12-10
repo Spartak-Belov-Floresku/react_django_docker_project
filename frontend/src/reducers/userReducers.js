@@ -19,6 +19,11 @@ import {
     USER_UPDATE_PROFILE_FAIL,
     USER_UPDATE_PROFILE_RESET,
 
+    USER_ADDRESS_DETAILS_REQUEST,
+    USER_ADDRESS_DETAILS_SUCCESS,
+    USER_ADDRESS_DETAILS_FAIL,
+    USER_ADDRESS_DETAILS_RESET,
+
     USER_LIST_REQUEST,
     USER_LIST_SUCCESS,
     USER_LIST_FAIL,
@@ -89,6 +94,21 @@ export const userUpdateProfileReducers = (state={}, action) => {
             return { loading: false, error: action.payload }
         case USER_UPDATE_PROFILE_RESET:
             return {}
+        default:
+            return state
+    }
+}
+
+export const userAddressDetailsReducers = (state={address:{}}, action) => {
+    switch(action.type){
+        case USER_ADDRESS_DETAILS_REQUEST:
+            return { ...state, loading: true }
+        case USER_ADDRESS_DETAILS_SUCCESS:
+            return { loading: true, address: action.payload }
+        case USER_ADDRESS_DETAILS_FAIL:
+            return { error: action.payload }
+        case USER_ADDRESS_DETAILS_RESET:
+            return { address: {}}
         default:
             return state
     }

@@ -1,9 +1,10 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import { Form, Button } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import FormContainer from '../components/FormContainer'
-import { saveShippingAddress } from '../actions/cartActions'
+import { getUserAddressDetails } from '../actions/userActions'
+import { saveShippingAddress } from '../actions/userActions'
 import CheckoutSteps from '../components/CheckoutSteps'
 
 export default function ShippingScreen() {
@@ -18,13 +19,22 @@ export default function ShippingScreen() {
   const [city, setCity] = useState(shippingAddress.city)
   const [zipCode, setZipCode] = useState(shippingAddress.zipCode)
 
+  useEffect(()=> {
+    dispatch(getUserAddressDetails())
+    if(shippingAddress.address){
+      setAddress(shippingAddress.address)
+      setCity(shippingAddress.city)
+      setZipCode(shippingAddress.zipCode)
+    }
+  }, [shippingAddress.address])
+
   const submitHandler = e => {
     e.preventDefault()
     dispatch(saveShippingAddress({
-      address,
-      city,
-      zipCode,
-    }))
+        address,
+        city,
+        zipCode,
+      }))
     navigate('/payment')
   }
 
