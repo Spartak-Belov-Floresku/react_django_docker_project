@@ -33,7 +33,7 @@ function App() {
           <Route path='/register/:redirect' element={<RegisterScreen />} />
           <Route path='/profile' element={<ProfileScreen />} />
           <Route path='/shipping' element={<ShippingScreen />} />
-          
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Container>

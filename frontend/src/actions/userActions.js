@@ -112,7 +112,7 @@ export const register = (name, email, password) => async (dispatch) => {
                     'password': password,
                 },
                 config,
-            );
+            )
 
         dispatch({
             type: USER_REGISTER_SUCCESS,
@@ -158,7 +158,7 @@ export const getUserDetails = request => async (dispatch, getState) => {
         const {data} = await axios.get(
                 `/api/users/${request}/`,
                 config,
-            );
+            )
 
         dispatch({
             type: USER_DETAILS_SUCCESS,
@@ -196,7 +196,7 @@ export const getUserAddressDetails = () => async (dispatch, getState) => {
         const {data} = await axios.get(
                 `/api/users/address/`,
                 config,
-            );
+            )
 
         dispatch({
             type: USER_ADDRESS_DETAILS_SUCCESS,
@@ -221,13 +221,10 @@ export const getUserAddressDetails = () => async (dispatch, getState) => {
     }
 }
 
-export const saveShippingAddress = userAddress => async (dispatch, getState) => {
+export const saveUserAddress = userAddress => async (dispatch, getState) => {
 
     try{
-
-        const {
-            userLogin:{ userInfo }
-        } = getState()
+        const { userLogin:{ userInfo }} = getState()
 
         const config = {
             headers: {
@@ -244,18 +241,24 @@ export const saveShippingAddress = userAddress => async (dispatch, getState) => 
                     'zipCode': userAddress['zipCode'],
                 },
                 config,
-            );
+        )
+
+        dispatch({
+            type: USER_ADDRESS_DETAILS_SUCCESS,
+            payload: data,
+        })
 
         dispatch({
             type: CART_SAVE_SHIPPING_ADDRESS,
-            payload: userAddress,
+            payload: data,
         })
 
         localStorage.setItem('shippingAddress', JSON.stringify(data))
 
     }catch(error){
+
         dispatch({
-                type    : USER_ADDRESS_DETAILS_FAIL,
+                type : USER_ADDRESS_DETAILS_FAIL,
                 payload : error.response && error.response.data.detail
                             ? error.response.data.detail
                             : error.message,
@@ -305,7 +308,7 @@ export const updateUserProfile = user => async (dispatch, getState) => {
                         ? error.response.data.detail
                         : error.message,
 
-        });
+        })
     }
 }
 
@@ -364,7 +367,7 @@ export const deleteUser = id => async (dispatch, getState) => {
             }
         }
 
-        const {data} = await axios.delete(
+        await axios.delete(
                 `/api/users/delete/${id}/`,
                 config,
             )

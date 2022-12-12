@@ -3,30 +3,34 @@ import { Form, Button } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import FormContainer from '../components/FormContainer'
-import { getUserAddressDetails } from '../actions/userActions'
-import { saveShippingAddress } from '../actions/userActions'
+import { getUserAddressDetails, saveUserAddress } from '../actions/userActions'
+import { saveShippingAddress } from '../actions/cartActions'
 import CheckoutSteps from '../components/CheckoutSteps'
 
 export default function ShippingScreen() {
 
   const navigate = useNavigate()
-
-  const { shippingAddress } = useSelector(state => state.cart)
-
   const dispatch = useDispatch()
 
+  const { shippingAddress } = useSelector(state => state.cart)
+  const { userInfo } = useSelector(state => state.userLogin)
   const [address, setAddress] = useState(shippingAddress.address)
   const [city, setCity] = useState(shippingAddress.city)
   const [zipCode, setZipCode] = useState(shippingAddress.zipCode)
 
   useEffect(()=> {
-    dispatch(getUserAddressDetails())
+
+    if(userInfo){
+      dispatch(getUserAddressDetails())
+    }
+
     if(shippingAddress.address){
       setAddress(shippingAddress.address)
       setCity(shippingAddress.city)
       setZipCode(shippingAddress.zipCode)
     }
-  }, [shippingAddress.address])
+
+  }, [dispatch, shippingAddress.address, shippingAddress.city, shippingAddress.zipCode, userInfo])
 
   const submitHandler = e => {
     e.preventDefault()
@@ -35,6 +39,13 @@ export default function ShippingScreen() {
         city,
         zipCode,
       }))
+    if(userInfo){
+      dispatch(saveUserAddress({
+        address,
+        city,
+        zipCode,
+      }))
+    }
     navigate('/payment')
   }
 
