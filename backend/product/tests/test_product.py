@@ -74,3 +74,10 @@ class ProductAPITests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+    
+    def test_get_product_unsuccess(self):
+        """Testing the reciving a product that doesn't exist."""
+        res = self.client.get(f'{PRRODUCT_DETAIL_URL}10/')
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

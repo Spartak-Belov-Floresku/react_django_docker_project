@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'product.apps.ProductConfig',
     'user.apps.UserConfig',
+    'order.apps.OrderConfig',
 ]
 
 REST_FRAMEWORK = {

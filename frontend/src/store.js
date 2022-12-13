@@ -18,6 +18,14 @@ import {
     userDeleteReducers,
     userUpdateReducers,
 } from './reducers/userReducers'
+import { 
+    orderCreateReducer,
+    orderDetailsReducer,
+    orderPayReducer,
+    orderListMyReducer,
+    orderListReducer,
+    orderDeliverReducer,
+} from './reducers/orderReducers'
 
 const reducer = combineReducers({
     productList: productListReducers,
@@ -33,6 +41,13 @@ const reducer = combineReducers({
     usersList: userListReducers,
     userDelete: userDeleteReducers,
     userUpdate: userUpdateReducers,
+
+    orderCreate: orderCreateReducer,
+    orderDetails: orderDetailsReducer,
+    orderPay: orderPayReducer,
+    orderListMy: orderListMyReducer,
+    orderList: orderListReducer,
+    orderDeliver: orderDeliverReducer,
 })
 
 const initialState = {

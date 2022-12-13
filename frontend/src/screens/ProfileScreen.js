@@ -7,7 +7,7 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import { getUserDetails, updateUserProfile, logout } from '../actions/userActions'
 import { USER_UPDATE_PROFILE_RESET } from '../constants/userConstants'
-// import { listMyOrders } from '../actions/orderActions'
+import { listMyOrders } from '../actions/orderActions'
 
 export default function ProfileScreen() {
 
@@ -23,10 +23,8 @@ export default function ProfileScreen() {
     const { loading: loadingProfile, user: userProfile, error: errorProfile } = useSelector(state => state.userDetails)
     const { userInfo } = useSelector(state => state.userLogin)
     const { success } = useSelector(state => state.userUpdateProfile)
-    // const { loading: loadingOrders, orders: listOrders, error: errorOrders } = useSelector(state => state.orderListMy)
-    let loadingOrders = false
-    let listOrders = []
-    let errorOrders = ''
+    const { loading: loadingOrders, orders: listOrders, error: errorOrders } = useSelector(state => state.orderListMy)
+    
     useEffect(() => {
         if(!userInfo){
             navigate(`/login`)
@@ -34,7 +32,7 @@ export default function ProfileScreen() {
             if(!userProfile || !userProfile.name || success || userInfo.id !== userProfile.id){
                 dispatch({type: USER_UPDATE_PROFILE_RESET})
                 dispatch(getUserDetails('profile'))
-                // dispatch(listMyOrders())
+                dispatch(listMyOrders())
                 setPassword('')
                 setConfirmPassword('')
             }else{
