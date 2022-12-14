@@ -22,11 +22,10 @@ from datetime import datetime
 def addOrdersItems(request):
     user = request.user
     data = request.data
-    orderItems = data['orderItems']
-
-    if orderItems and len(orderItems) == 0:
-        return Response({'detail':'No order items'}, status=status.HTTP_400_BAD_REQUEST)
-    else:
+    try:
+        orderItems = data['orderItems']
+        if not orderItems or not len(orderItems):
+            raise
 
         order = Order.objects.create(
             user=user,
@@ -44,7 +43,7 @@ def addOrdersItems(request):
 
         for item in orderItems:
             product=Product.objects.get(id=item['product'])
-            
+
             orderItem = OrderItem.objects.create(
                 product=product,
                 order=order,
@@ -59,3 +58,5 @@ def addOrdersItems(request):
 
         serializer = OrderSerializer(order, many=False)
         return Response(serializer.data)
+    except:
+        return Response({'detail':'No order items'}, status=status.HTTP_400_BAD_REQUEST)
