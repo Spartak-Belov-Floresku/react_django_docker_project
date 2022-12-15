@@ -15,6 +15,9 @@ from core.models import *
 TOKEN_URL = reverse('user:user-token')
 CREATE_ORDER_URL = reverse('order:orders-add')
 
+def get_user_order_by_order_id(id):
+    return reverse('order:user-order', args=(id,))
+
 def create_user(params, admin=False):
     """Create and return a new user."""
     if not admin:
@@ -70,14 +73,14 @@ class OrderAPITests(TestCase):
             'totalPrice': self.product.price+10
         }
         res = get_token(self.client.post, self.user_payload)
-        self.token = {'HTTP_AUTHORIZATION': f'Bearer {res.data.get("token")}'}
+        self.user_token = {'HTTP_AUTHORIZATION': f'Bearer {res.data.get("token")}'}
 
 
 
     def test_create_order_success(self):
         """Test creating a new order."""
 
-        res = self.client.post(CREATE_ORDER_URL, self.order, **self.token, format='json')
+        res = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data['user']['id'], self.user.id)
@@ -88,7 +91,7 @@ class OrderAPITests(TestCase):
         """Test unsuccess creating a new order."""
         del self.order['orderItems']
 
-        res = self.client.post(CREATE_ORDER_URL, self.order, **self.token, format='json')
+        res = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -99,3 +102,65 @@ class OrderAPITests(TestCase):
         res = self.client.post(CREATE_ORDER_URL, self.order, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+    def test_get_order_authorized_user_success(self):
+        """Test success getting order related to the user."""
+
+        res1 = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        res2 = self.client.get(get_user_order_by_order_id(res1.data['id']), **self.user_token)
+
+        self.assertEqual(res2.status_code, status.HTTP_200_OK)
+        self.assertEqual(res2.data, res1.data)
+
+
+    def test_get_user_order_by_admin_success(self):
+        """Test success getting user's order with admin authorization."""
+
+        admin_params = {
+            'first_name': 'Test Admin',
+            'email': 'admin@mail.com',
+            'username': 'admin@mail.com',
+            'password': 'password123',
+        }
+
+        create_user(admin_params, True)
+        token_res = get_token(self.client.post, admin_params)
+        admin_token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
+
+        res1 = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        res2 = self.client.get(get_user_order_by_order_id(res1.data['id']), **admin_token)
+
+        self.assertEqual(res2.status_code, status.HTTP_200_OK)
+        self.assertEqual(res2.data, res1.data)
+
+
+    def test_get_order_authorized_user_unsuccess(self):
+        """Test getting order not exists by the user."""
+
+        res1 = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        res2 = self.client.get(get_user_order_by_order_id(res1.data['id']+1), **self.user_token)
+
+        self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_get_user_order_by_other_user_unsuccess(self):
+        """Test getting user's order with diffrent user."""
+
+        other_user_params = {
+            'first_name': 'Test Other',
+            'email': 'other@mail.com',
+            'username': 'other@mail.com',
+            'password': 'password123',
+        }
+
+        create_user(other_user_params)
+        token_res = get_token(self.client.post, other_user_params)
+        other_user_token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
+
+        res1 = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        res2 = self.client.get(get_user_order_by_order_id(res1.data['id']), **other_user_token)
+
+        self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
+
+

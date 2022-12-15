@@ -16,11 +16,10 @@ from product.serializers import ProductSerializer
 
 
 ALL_PRODUCTS_URL = reverse('product:products')
-PRRODUCT_DETAIL_URL = reverse('product:products')
 
-def detail_url(product_id):
+def product_detail_url(id):
     """Return a product detail url."""
-    return reverse('product:products:', args=[product_id])
+    return reverse('product:product', args=(id,))
 
 def create_user(admin=False, **params):
     """Create and return a new user."""
@@ -69,15 +68,15 @@ class ProductAPITests(TestCase):
 
     def test_get_product(self):
         """Testing the reciving of a specific product."""
-        res = self.client.get(f'{PRRODUCT_DETAIL_URL}{self.product.id}/')
+        res = self.client.get(product_detail_url(self.product.id))
         serializer = ProductSerializer(self.product, many=False)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
-    
+
     def test_get_product_unsuccess(self):
         """Testing the reciving a product that doesn't exist."""
-        res = self.client.get(f'{PRRODUCT_DETAIL_URL}10/')
+        res = self.client.get(product_detail_url(100))
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

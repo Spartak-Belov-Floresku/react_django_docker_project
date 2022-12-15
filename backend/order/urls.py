@@ -9,4 +9,5 @@ app_name = 'order'
 
 urlpatterns = [
     path('add/', addOrdersItems, name='orders-add'),
+    path('<str:pk>/', getOrderById, name='user-order'),
 ]
