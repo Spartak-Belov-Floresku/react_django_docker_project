@@ -55,20 +55,15 @@ export default function OrderScreen() {
 
     }, [dispatch, userInfo, order, orderId, successPay, successDeliver])
 
-    const successPaymentHandler = paymentResult => {
-        dispatch(payOrder(orderId, paymentResult))
-    }
-
-    const deliverHandler = paymentResult => {
-        dispatch(deliverOrder(order))
-    }
+    const successPaymentHandler = paymentResult => {dispatch(payOrder(orderId, paymentResult))}
+    const deliverHandler = () => {dispatch(deliverOrder(order))}
 
     return loading?
     (
         <Loader />
     ): error ? (
         <Message variant='danger'>{error}</Message>
-    ):( 
+    ):(
         <>  <h3>Order #{order.id}</h3>
             <Row className='opacity'>
                 <Col md={8}>
@@ -89,7 +84,7 @@ export default function OrderScreen() {
                                 <Message variant='warning'>Not Delivered</Message>
                             )}
                         </ListGroup.Item>
-                
+
                         <ListGroup.Item>
                             <h4>Payment Method</h4>
                             <div>
@@ -116,7 +111,7 @@ export default function OrderScreen() {
                                                     <ListGroup.Item key={index}>
                                                         <Row>
                                                             <Col md={1}>
-                                                                <Image src={item.image} alt={item.name} fluid rounded /> 
+                                                                <Image src={item.image} alt={item.name} fluid rounded />
                                                             </Col>
                                                             <Col>
                                                                 <Link to={`/product/${item.product}`}>{item.name}</Link>

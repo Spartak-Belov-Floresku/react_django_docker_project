@@ -14,9 +14,16 @@ from core.models import *
 
 TOKEN_URL = reverse('user:user-token')
 CREATE_ORDER_URL = reverse('order:orders-add')
+GET_USER_ORDERS = reverse('order:myorders')
+
+def deliver_orde_url(id):
+    return reverse('order:order-delivered', args=(id,))
 
 def get_user_order_by_order_id(id):
     return reverse('order:user-order', args=(id,))
+
+def pay_order_url(id):
+    return reverse('order:pay', args=(id,))
 
 def create_user(params, admin=False):
     """Create and return a new user."""
@@ -76,7 +83,6 @@ class OrderAPITests(TestCase):
         self.user_token = {'HTTP_AUTHORIZATION': f'Bearer {res.data.get("token")}'}
 
 
-
     def test_create_order_success(self):
         """Test creating a new order."""
 
@@ -102,6 +108,29 @@ class OrderAPITests(TestCase):
         res = self.client.post(CREATE_ORDER_URL, self.order, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+    def test_get_user_orders_success(self):
+        """Test getting user orders."""
+
+        self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+
+        res_user_orders = self.client.get(GET_USER_ORDERS, **self.user_token)
+
+        self.assertEqual(res_user_orders.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res_user_orders.data), 2)
+
+
+    def test_get_unauthenticated_user_orders_ussuccess(self):
+        """Test getting unauthenticated user orders ussuccess."""
+
+        self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+
+        res_user_orders = self.client.get(GET_USER_ORDERS)
+
+        self.assertEqual(res_user_orders.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
     def test_get_order_authorized_user_success(self):
@@ -164,3 +193,52 @@ class OrderAPITests(TestCase):
         self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
 
 
+    def test_mark_order_as_delivered_by_admin_success(self):
+        """Test set order as delivered with admin authorization."""
+
+        admin_params = {
+            'first_name': 'Test Admin',
+            'email': 'admin@mail.com',
+            'username': 'admin@mail.com',
+            'password': 'password123',
+        }
+
+        create_user(admin_params, True)
+        token_res = get_token(self.client.post, admin_params)
+        admin_token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
+
+        res_create_order = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        res_mark_order_delivered = self.client.put(deliver_orde_url(res_create_order.data['id']), **admin_token)
+        res_get_order_by_user = self.client.get(get_user_order_by_order_id(res_create_order.data['id']), **self.user_token)
+
+        self.assertEqual(res_mark_order_delivered.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_get_order_by_user.data['isDelivered'], True)
+
+
+    def test_mark_order_as_delivered_by_user_unsuccess(self):
+        """Test set order as delivered with user authorization unsuccess."""
+
+        res_create_order = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        res_mark_order_delivered = self.client.put(deliver_orde_url(res_create_order.data['id']), **self.user_token)
+
+        self.assertEqual(res_mark_order_delivered.status_code, status.HTTP_403_FORBIDDEN)
+
+
+    def test_pay_order_success(self):
+        """Test to pay order by authenticated user."""
+
+        res_create_order = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        res_pay_order = self.client.put(pay_order_url(res_create_order.data['id']), **self.user_token)
+        res_confirmed_order_was_paied = self.client.get(get_user_order_by_order_id(res_create_order.data['id']), **self.user_token)
+
+        self.assertEqual(res_pay_order.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_confirmed_order_was_paied.data['isPaid'], True)
+
+
+    def test_pay_order_unauthenticated_user_unsuccess(self):
+        """Test to pay order by unauthenticated user."""
+
+        res_create_order = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        res_pay_order = self.client.put(pay_order_url(res_create_order.data['id']))
+
+        self.assertEqual(res_pay_order.status_code, status.HTTP_401_UNAUTHORIZED)

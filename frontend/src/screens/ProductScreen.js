@@ -22,7 +22,6 @@ export default function ProductScreen() {
     if(!error && 'id' in product && product.id != productId ){
         product = {}
         loading = true
-        console.log('Id trigeg')
     }
 
     useEffect(() => { dispatch(listProductDetails(productId)) }, [productId])

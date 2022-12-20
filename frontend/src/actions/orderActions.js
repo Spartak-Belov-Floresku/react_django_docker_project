@@ -1,13 +1,13 @@
 import axios from 'axios'
-import { 
+import {
     ORDER_CREATE_REQUEST,
     ORDER_CREATE_SUCCESS,
-    ORDER_CREATE_FAIL, 
+    ORDER_CREATE_FAIL,
 
     ORDER_DETAILS_REQUEST,
     ORDER_DETAILS_SUCCESS,
     ORDER_DETAILS_FAIL,
-    
+
     ORDER_PAY_REQUEST,
     ORDER_PAY_SUCCESS,
     ORDER_PAY_FAIL,
@@ -46,7 +46,7 @@ export const createOrder = order => async (dispatch, getState) => {
         const {data} = await axios.post(
                 `/api/orders/add/`,
                 order,
-                config,              
+                config,
             );
 
         dispatch({
@@ -91,7 +91,7 @@ export const getOrderDetails = id => async (dispatch, getState) => {
 
         const {data} = await axios.get(
                 `/api/orders/${id}/`,
-                config,              
+                config,
             );
 
         dispatch({
@@ -129,7 +129,7 @@ export const payOrder = (id, paymentResult) => async (dispatch, getState) => {
         const {data} = await axios.put(
                 `/api/orders/${id}/pay/`,
                 paymentResult,
-                config,              
+                config,
             );
 
         dispatch({
@@ -167,7 +167,7 @@ export const deliverOrder = order => async (dispatch, getState) => {
         const {data} = await axios.put(
                 `/api/orders/${order.id}/deliver/`,
                 {},
-                config,              
+                config,
             );
 
         dispatch({
@@ -204,7 +204,7 @@ export const listMyOrders = () => async (dispatch, getState) => {
 
         const {data} = await axios.get(
                 `/api/orders/myorders/`,
-                config,              
+                config,
             );
 
         dispatch({
@@ -241,7 +241,7 @@ export const listOrders = () => async (dispatch, getState) => {
 
         const {data} = await axios.get(
                 `/api/orders/`,
-                config,              
+                config,
             );
 
         dispatch({
