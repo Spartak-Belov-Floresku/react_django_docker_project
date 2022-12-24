@@ -15,16 +15,12 @@ TOKEN_URL = reverse('user:user-token')
 REGESTER_USER_URL = reverse('user:register')
 PROFILE_URL = reverse('user:user-profile')
 UPDATE_PROFILE_URL = reverse('user:user-profile-update')
-PROFILE_ALL_USERS_URL = reverse('user:users')
 GET_USER_ADDRESS = reverse('user:user-address')
 CREATE_USER_ADDRESS = reverse('user:user-address-create')
 
-def create_user(params, admin=False):
+def create_user(params):
     """Create and return a new user."""
-    if not admin:
-        return User.objects.create_user(**params)
-    else:
-        return User.objects.create_superuser(**params)
+    return User.objects.create_user(**params)
 
 def create_user_address(params):
     """Create and return a new user address."""
@@ -171,17 +167,17 @@ class UserAPITests(TestCase):
 
     def test_update_user_profile_with_invalid_email(self):
         """Test update user profile with an invalid email."""
-        res = get_token(self.client.post, self.payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res.data.get("token")}'}
+        token_res = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
         payload= {
             'email': 'update_email.com',
             'name': 'Update Name',
             'password': ''
         }
 
-        res = self.client.put(UPDATE_PROFILE_URL, payload, **token, format='json')
+        user_update_res = self.client.put(UPDATE_PROFILE_URL, payload, **token, format='json')
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(user_update_res.status_code, status.HTTP_400_BAD_REQUEST)
 
 
     def test_unathorized_update_user_profile(self):
@@ -205,69 +201,19 @@ class UserAPITests(TestCase):
 
     def test_retrieve_profile_success(self):
         """Test retrieving profile for valid token in user."""
-        res1 = get_token(self.client.post, self.payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
+        token_res = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
 
-        res2 = self.client.get(PROFILE_URL, **token)
+        user_profile_res = self.client.get(PROFILE_URL, **token)
 
-        self.assertEqual(res2.status_code, status.HTTP_200_OK)
-        self.assertEqual(res2.data, {
+        self.assertEqual(user_profile_res.status_code, status.HTTP_200_OK)
+        self.assertEqual(user_profile_res.data, {
             'id': self.user.id,
             'username': self.user.username,
             'email': self.user.email,
             'name': self.user.first_name,
             'isAdmin': False
         })
-
-
-    def test_retrieve_profile_for_admin_user_success(self):
-        """Test retrieving admin profile for valid token in user."""
-        payload = {
-                'first_name': 'Admin Name',
-                'email': 'admin@mail.com',
-                'username': 'admin@mail.com',
-                'password': 'password123',
-            }
-        admin_user = create_user(payload, True)
-        res1 = get_token(self.client.post, payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
-        res2 = self.client.get(PROFILE_URL, **token)
-
-        self.assertEqual(res2.status_code, status.HTTP_200_OK)
-        self.assertEqual(res2.data, {
-            'id': admin_user.id,
-            'username': admin_user.username,
-            'email': admin_user.email,
-            'name': admin_user.first_name,
-            'isAdmin': True
-        })
-
-
-    def test_retrieve_all_users_success(self):
-        """Test retrieving profiles for all users using a valid admin token."""
-        payload = {
-                'first_name': 'Admin Name',
-                'email': 'admin@mail.com',
-                'username': 'admin@mail.com',
-                'password': 'password123',
-            }
-        create_user(payload, True)
-        users = User.objects.all()
-        res1 = get_token(self.client.post, payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
-        res2 = self.client.get(PROFILE_ALL_USERS_URL, **token)
-
-        self.assertEqual(res2.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res2.data), len(users))
-
-
-    def test_unathorized_retrieve_all_users(self):
-        """Test returns error if credentials invalid for admin."""
-        res1 = get_token(self.client.post, self.payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
-        res2 = self.client.get(PROFILE_ALL_USERS_URL, **token)
-
-        self.assertEqual(res2.status_code, status.HTTP_403_FORBIDDEN)
 
 
     def test_get_user_address(self):
@@ -280,22 +226,22 @@ class UserAPITests(TestCase):
             'zipCode': '00000'
         })
 
-        res1 = get_token(self.client.post, self.payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
-        res2 = self.client.get(GET_USER_ADDRESS, **token)
+        token_res = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
+        user_address_res = self.client.get(GET_USER_ADDRESS, **token)
 
-        self.assertEqual(res2.status_code, status.HTTP_200_OK)
-        self.assertEqual(res2.data['address'], user_address.address)
+        self.assertEqual(user_address_res.status_code, status.HTTP_200_OK)
+        self.assertEqual(user_address_res.data['address'], user_address.address)
 
 
     def test_get_user_address_unsuccess(self):
         """Test get address not exists."""
 
-        res1 = get_token(self.client.post, self.payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
-        res2 = self.client.get(GET_USER_ADDRESS, **token)
+        token_res = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
+        user_address_res = self.client.get(GET_USER_ADDRESS, **token)
 
-        self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(user_address_res.status_code, status.HTTP_400_BAD_REQUEST)
 
 
     def test_create_user_address(self):
@@ -305,12 +251,12 @@ class UserAPITests(TestCase):
             'city': 'Test City',
             'zipCode': '00000'
         }
-        res1 = get_token(self.client.post, self.payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
-        res2 = self.client.post(CREATE_USER_ADDRESS, user_address, **token, format='json')
+        token_res = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
+        user_address_res = self.client.post(CREATE_USER_ADDRESS, user_address, **token, format='json')
 
-        self.assertEqual(res2.status_code, status.HTTP_200_OK)
-        self.assertEqual(res2.data['address'], user_address['address'])
+        self.assertEqual(user_address_res.status_code, status.HTTP_200_OK)
+        self.assertEqual(user_address_res.data['address'], user_address['address'])
 
 
     def test_update_user_address(self):
@@ -328,10 +274,10 @@ class UserAPITests(TestCase):
             'zipCode': '00000'
         }
 
-        res1 = get_token(self.client.post, self.payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res1.data.get("token")}'}
-        res2 = self.client.post(CREATE_USER_ADDRESS, updated_user_address, **token, format='json')
+        token_res = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
+        user_updated_address_res = self.client.post(CREATE_USER_ADDRESS, updated_user_address, **token, format='json')
 
-        self.assertEqual(res2.status_code, status.HTTP_200_OK)
+        self.assertEqual(user_updated_address_res.status_code, status.HTTP_200_OK)
         self.assertNotEqual(old_user_address.address, updated_user_address['address'])
-        self.assertEqual(res2.data['address'], updated_user_address['address'])
+        self.assertEqual(user_updated_address_res.data['address'], updated_user_address['address'])

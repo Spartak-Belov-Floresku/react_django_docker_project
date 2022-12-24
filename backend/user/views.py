@@ -73,14 +73,6 @@ def registerUser(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def getUserProfile(request):
-    user = request.user
-    serializer = UserSerializer(user, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def getUserAddress(request):
     user = request.user
     try:
@@ -118,12 +110,20 @@ def createUserAddress(request):
         return Response(serializer.data)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getUserProfile(request):
+    user = request.user
+    serializer = UserSerializer(user, many=False)
+    return Response(serializer.data)
+
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateUserProfile(request):
     user = request.user
     serializer = UserSerializerWithToken(user, many=False)
-    data  = request.data
+    data = request.data
     try:
         validate_email(data['email'])
     except:
@@ -148,3 +148,58 @@ def getUsers(request):
     users = User.objects.all()
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def getUserById(request, pk):
+    try:
+        user = User.objects.get(id=pk)
+        serializer = UserSerializer(user, many=False)
+        return Response(serializer.data)
+    except:
+        return Response({'detail': f'User with id {pk} does not exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def updateUser(request, pk):
+    user = User.objects.get(id=pk)
+    data  = request.data
+    user.first_name = data.get('name') or user.first_name
+
+    try:
+        validate_email(data.get('email'))
+        user.username = data.get('email')
+        user.email = data.get('email')
+    except:
+        user.username = user.email
+        user.email = user.email
+
+    user.is_staff = data.get('isAdmin') or False
+
+    if bool(data.get('password') or False):
+        password, message = validate_password(data.get('password'))
+        if not password:
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        user.password = make_password(data.get('password'))
+
+    user.save()
+
+    serializer = UserSerializer(user, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def deleteUser(request, pk):
+    user = request.user
+    if str(user.id) != str(pk):
+        try:
+            userToDelete = User.objects.get(id=pk)
+            userToDelete.delete()
+            return Response('User was deleted')
+        except:
+            return Response({'detail': f'User with id {pk} does not exists.'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({'detail': 'The operation is not allowed.'}, status=status.HTTP_400_BAD_REQUEST)
