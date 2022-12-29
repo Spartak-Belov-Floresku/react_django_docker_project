@@ -85,7 +85,6 @@ class OrderAPITests(TestCase):
 
     def test_create_order_success(self):
         """Test creating a new order."""
-
         res = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)

@@ -21,7 +21,7 @@ def product_detail_url(id):
     """Return a product detail url."""
     return reverse('product:product', args=(id,))
 
-def create_user(admin=False, **params):
+def create_user():
     """Create and return a new user."""
     defaults = {
         'first_name': 'testname',
@@ -29,12 +29,8 @@ def create_user(admin=False, **params):
         'email': 'test@mail.com',
         'password': 'password123',
     }
-    defaults.update(params)
 
-    if not admin:
-        return User.objects.create_user(**defaults)
-    else:
-        return User.objects.create_superuser(**defaults)
+    return User.objects.create_superuser(**defaults)
 
 def create_product(user):
     """Create and return a product"""
@@ -42,7 +38,8 @@ def create_product(user):
         user=user,
         name='Sample product name',
         description='Sample product description',
-        price=Decimal('5.50')
+        price=Decimal('5.50'),
+        active=True,
     )
 
     return product
@@ -56,27 +53,27 @@ class ProductAPITests(TestCase):
         self.user = create_user()
         self.product = create_product(self.user)
 
-    def test_retrive_products(self):
+    def test_retrive_products_success(self):
         """Test retrieving a list of products."""
-        res = self.client.get(ALL_PRODUCTS_URL)
+        res_products = self.client.get(ALL_PRODUCTS_URL)
         products = Product.objects.all().order_by('-id')
         serializer = ProductSerializer(products, many=True)
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res_products.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_products.data, serializer.data)
 
 
-    def test_get_product(self):
+    def test_get_product_success(self):
         """Testing the reciving of a specific product."""
-        res = self.client.get(product_detail_url(self.product.id))
+        res_product_details = self.client.get(product_detail_url(self.product.id))
         serializer = ProductSerializer(self.product, many=False)
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res_product_details.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_product_details.data, serializer.data)
 
 
     def test_get_product_unsuccess(self):
         """Testing the reciving a product that doesn't exist."""
-        res = self.client.get(product_detail_url(100))
+        res_product_details = self.client.get(product_detail_url(100))
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res_product_details.status_code, status.HTTP_400_BAD_REQUEST)

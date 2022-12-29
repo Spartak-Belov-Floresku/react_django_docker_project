@@ -25,7 +25,7 @@ export default function UserListSreen() {
             navigate('/login')
         }
 
-    },[dispatch, userInfo, successDelete])
+    },[dispatch, navigate, userInfo, successDelete])
 
     const deleteHandler = id => {
         if(window.confirm(`Are you sure? You want to delete this user ${id}`))

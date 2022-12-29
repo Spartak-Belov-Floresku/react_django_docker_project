@@ -22,6 +22,7 @@ from datetime import datetime
 def addOrdersItems(request):
     user = request.user
     data = request.data
+
     try:
         orderItems = data['orderItems']
         if not orderItems or not len(orderItems):
@@ -43,6 +44,7 @@ def addOrdersItems(request):
 
         for item in orderItems:
             product=Product.objects.get(id=item['product'])
+            image = product.image.url if product.image else ''
 
             orderItem = OrderItem.objects.create(
                 product=product,
@@ -50,7 +52,7 @@ def addOrdersItems(request):
                 name=product.name,
                 qty=item['qty'],
                 price=item['price'],
-                image=product.image.url,
+                image=image,
             )
 
             product.countInStock -= orderItem.qty

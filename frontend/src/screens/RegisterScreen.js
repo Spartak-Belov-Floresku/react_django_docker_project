@@ -26,11 +26,11 @@ export default function RegisterScreen() {
       if(userInfo){
         navigate(`/${redirect? redirect: ''}`)
       }
-    }, [userInfo, redirect])
+    }, [navigate, userInfo, redirect])
 
     const submitHandler = e => {
         e.preventDefault()
-        if(password != confirmPassword) 
+        if(password != confirmPassword)
             setMessage('Passwords do not match')
         else if(password.length < 8 && password.length)
             setMessage('Passwords must be at least 8 characters')
@@ -95,11 +95,11 @@ export default function RegisterScreen() {
             </Form.Group>
 
             <Button
-                className='mt-2' 
+                className='mt-2'
                 type='submit'
                 variant='primary'>
                     Register
-            </Button> 
+            </Button>
 
         </Form>
         <Row className='py-3'>

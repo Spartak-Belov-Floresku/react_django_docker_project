@@ -85,6 +85,18 @@ class ModelTests(TestCase):
 
         self.assertEqual(str(product), product.name)
 
+    def test_create_product_unactive(self):
+        """Test creating a unactive product is successful."""
+        user = create_user()
+        product = models.Product.objects.create(
+            user=user,
+            name='Sample product name',
+            description='Sample product description',
+            price=Decimal('5.50')
+        )
+
+        self.assertEqual(str(product), product.name)
+
     @patch('core.models.uuid.uuid4')
     def test_product_file_name_uuid(self, mock_uuid):
         """Test generating image path."""

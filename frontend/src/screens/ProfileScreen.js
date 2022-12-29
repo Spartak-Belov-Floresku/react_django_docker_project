@@ -24,7 +24,7 @@ export default function ProfileScreen() {
     const { userInfo } = useSelector(state => state.userLogin)
     const { success } = useSelector(state => state.userUpdateProfile)
     const { loading: loadingOrders, orders: listOrders, error: errorOrders } = useSelector(state => state.orderListMy)
-    
+
     useEffect(() => {
         if(!userInfo){
             navigate(`/login`)

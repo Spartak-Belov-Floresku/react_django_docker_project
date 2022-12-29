@@ -33,10 +33,6 @@ export default function UserEditScreen() {
 
     useEffect(() => {
 
-        if(!user || !Object.keys(user).length){
-            navigate('/admin/userlist')
-        }
-
         if(successUpdate){
             dispatch({type: USER_UPDATE_RESET})
             navigate('/admin/userlist')
@@ -51,7 +47,7 @@ export default function UserEditScreen() {
             }
         }
 
-    }, [user, userId, successUpdate])
+    }, [user, userId, successUpdate, navigate, dispatch])
 
     const submitHandler = e => {
         e.preventDefault()
