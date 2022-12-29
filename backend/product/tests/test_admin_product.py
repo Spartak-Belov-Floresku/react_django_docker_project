@@ -73,6 +73,12 @@ class AdminProductAPITests(TestCase):
         self.assertEqual(res_product.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res_product.data), 1)
 
+    def test_get_products_by_admin_unsuccess(self):
+        """Test get all products without admin authentication."""
+        res_product = self.client.get(GET_ALL_PRODUCTS)
+
+        self.assertEqual(res_product.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_create_product_success(self):
         """Test creates product."""
         res_product = self.client.post(CREATE_PRODUCT_URL, **self.token)
