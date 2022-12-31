@@ -1,5 +1,5 @@
 """
-Tests for the product API.
+Tests for the product admin API.
 """
 from decimal import Decimal
 from django.contrib.auth.models import User
@@ -16,6 +16,10 @@ from product.serializers import ProductSerializer
 TOKEN_URL = reverse('user:user-token')
 GET_ALL_PRODUCTS = reverse('product:admin-products')
 CREATE_PRODUCT_URL = reverse('product:create-product')
+
+def update_product_url(id):
+    """Update product url."""
+    return reverse('product:update-product', args=(id,))
 
 def product_delete_url(id):
     """Delete product url."""
@@ -90,6 +94,32 @@ class AdminProductAPITests(TestCase):
     def test_create_product_unsuccess(self):
         """Test creates product without valid token."""
         res_product = self.client.post(CREATE_PRODUCT_URL)
+
+        self.assertEqual(res_product.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_update_product_success(self):
+        """Test updates product."""
+        product_serializer = ProductSerializer(self.product, many=False)
+        updated_payload = product_serializer.data
+
+        updated_payload['name'] = 'Updated Name'
+        updated_payload['active'] = True
+
+        res_product = self.client.put(update_product_url(self.product.id), updated_payload, **self.token, format='json')
+        product_update = Product.objects.get(id=self.product.id)
+        product_serializer = ProductSerializer(product_update, many=False)
+
+        self.assertEqual(res_product.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_product.data, product_serializer.data)
+
+    def test_update_product_unsuccess(self):
+        """Test updates product without valid token."""
+        product_serializer = ProductSerializer(self.product, many=False)
+        updated_payload = product_serializer.data
+
+        updated_payload['name'] = 'Updated Name'
+
+        res_product = self.client.put(update_product_url(self.product.id), updated_payload, format='json')
 
         self.assertEqual(res_product.status_code, status.HTTP_401_UNAUTHORIZED)
 

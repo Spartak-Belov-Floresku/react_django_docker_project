@@ -22,6 +22,7 @@ import OrderScreen from './screens/OrderScreen'
 import UserListScreen from './screens/UserListScreen'
 import UserEditScreen from './screens/UserEditScreen'
 import ProductListScreen from './screens/ProductListScreen'
+import {ProductEditScreen} from './screens/ProductEditScreen'
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
           <Route exact path='admin/user/:userId/edit' element={<UserEditScreen />} />
 
           <Route exact path='admin/productlist' element={<ProductListScreen/>} />
+          <Route path='/admin/product/:productId/edit' element={<ProductEditScreen />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

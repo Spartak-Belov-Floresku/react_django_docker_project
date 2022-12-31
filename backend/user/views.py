@@ -125,18 +125,18 @@ def updateUserProfile(request):
     serializer = UserSerializerWithToken(user, many=False)
     data = request.data
     try:
-        validate_email(data['email'])
+        validate_email(data.get('email'))
     except:
         message = {'detail': 'Enter a valid email address.'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
-    user.first_name = data['name']
-    user.username = data['email']
-    user.email = data['email']
-    if len(data['password']) > 0:
-        password, message = validate_password(data['password'])
+    user.first_name = data.get('name')
+    user.username = data.get('email')
+    user.email = data.get('email')
+    if len(data.get('password')) > 0:
+        password, message = validate_password(data.get('password'))
         if not password:
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
-        user.password = make_password(data['password'])
+        user.password = make_password(data.get('password'))
     user.save()
 
     return Response(serializer.data)

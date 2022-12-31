@@ -60,6 +60,26 @@ def createProduct(request):
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def updateProduct(request, pk):
+    data = request.data
+    product = Product.objects.get(id=pk)
+
+    product.name = data.get('name')
+    product.price = data.get('price')
+    product.brand = data.get('brand')
+    product.countInStock = data.get('countInStock')
+    product.category = data.get('category')
+    product.description = data.get('description')
+    product.active = data.get('active') or False
+
+    product.save()
+
+    serializer = ProductSerializer(product, many=False)
+    return Response(serializer.data)
+
+
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
 def deleteProduct(request, pk):
