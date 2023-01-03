@@ -10,6 +10,7 @@ app_name = 'product'
 urlpatterns = [
     path('', getProducts, name='products'),
     path('admin/products/', getProductsAdmin, name='admin-products'),
+    path('admin/upload/image/', uploadImage, name='admin-upload-image'),
 
     path('<str:pk>/', getProduct, name='product'),
 

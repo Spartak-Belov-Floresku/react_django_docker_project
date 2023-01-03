@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 
 from core.models import Product
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, ProductImageSerializer
 
 
 @api_view(['GET'])
@@ -78,6 +78,24 @@ def updateProduct(request, pk):
 
     serializer = ProductSerializer(product, many=False)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def uploadImage(request):
+
+    data = request.data
+    product_id = data['product_id']
+    product = Product.objects.get(id=product_id)
+    serializer = ProductImageSerializer(product, data=request.data)
+
+    if serializer.is_valid():
+        product.image.delete()
+        product.image = request.FILES.get('image')
+        product.save()
+        return Response('Image was uploaded', status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])

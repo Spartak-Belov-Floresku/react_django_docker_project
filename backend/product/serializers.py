@@ -18,3 +18,12 @@ class ProductSerializer(serializers.ModelSerializer):
     #     reviews = obj.review_set.all()
     #     serializer = ReviewSerializer(reviews, many=True)
     #     return serializer.data
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    """Serializer for uploading images to product."""
+
+    class Meta:
+        model = Product
+        fields = ['id', 'image']
+        read_only_fields = ['id']
+        extra_kwargs = {'image': {'required': 'True'}}

@@ -90,8 +90,7 @@ export const ProductEditScreen = () => {
 
     return (
         <>
-
-        <Link to='/admin/productlist'>
+        <Link to='/admin/productlist' className='btn btn-light my-3 rounded boxshadow'>
             Go Back
         </Link>
 

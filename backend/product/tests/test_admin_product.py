@@ -2,13 +2,18 @@
 Tests for the product admin API.
 """
 from decimal import Decimal
-from django.contrib.auth.models import User
+import tempfile
+import os
+
+from PIL import Image
+
 from django.urls import reverse
 from django.test import TestCase
 
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from django.contrib.auth.models import User
 from core.models import Product
 
 from product.serializers import ProductSerializer
@@ -16,6 +21,7 @@ from product.serializers import ProductSerializer
 TOKEN_URL = reverse('user:user-token')
 GET_ALL_PRODUCTS = reverse('product:admin-products')
 CREATE_PRODUCT_URL = reverse('product:create-product')
+UPLOAD_IMAGE = reverse('product:admin-upload-image')
 
 def update_product_url(id):
     """Update product url."""
@@ -138,3 +144,69 @@ class AdminProductAPITests(TestCase):
         res_product_deleted = self.client.delete(product_delete_url(self.product.id))
 
         self.assertEqual(res_product_deleted.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class ImageUploadTests(TestCase):
+    """Tests for the image upload API."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.admin_data = {
+            'first_name': 'Admin Name',
+            'username': 'admin@mail.com',
+            'email': 'admin@mail.com',
+            'password': 'password123',
+        }
+        self.admin = create_admin(self.admin_data)
+        self.token = get_token(self.client.post, self.admin_data)
+        self.product = create_product(self.admin)
+
+    def tearDown(self):
+        self.product.image.delete()
+
+
+    def test_upload_image(self):
+        """Test uploading image to a product."""
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as image_file:
+            img = Image.new('RGB', (10, 10))
+            img.save(image_file, format='JPEG')
+            image_file.seek(0)
+            payload = {'image': image_file, 'product_id': self.product.id}
+            res = self.client.post(UPLOAD_IMAGE, payload, **self.token, fromat='multipart')
+
+        self.product.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('Image was uploaded', res.data)
+        self.assertTrue(os.path.exists(self.product.image.path))
+
+    def test_update_image(self):
+        """Test updating image to a product."""
+
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as image_file:
+            img = Image.new('RGB', (10, 10))
+            img.save(image_file, format='JPEG')
+            image_file.seek(0)
+            payload = {'image': image_file, 'product_id': self.product.id}
+            res = self.client.post(UPLOAD_IMAGE, payload, **self.token, fromat='multipart')
+
+        self.product.refresh_from_db()
+        old_path = self.product.image.path
+
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as new_image_file:
+            new_img = Image.new('RGB', (10, 10))
+            new_img.save(new_image_file, format='JPEG')
+            new_image_file.seek(0)
+            payload = {'image': new_image_file, 'product_id': self.product.id}
+            res = self.client.post(UPLOAD_IMAGE, payload, **self.token, fromat='multipart')
+
+        self.product.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertFalse(os.path.exists(old_path))
+        self.assertTrue(os.path.exists(self.product.image.path))
+
+    def test_upload_image_bad_request(self):
+        """Test uploading invalid image."""
+        payload = {'iamge': 'string', 'product_id': self.product.id}
+        res = self.client.post(UPLOAD_IMAGE, payload, **self.token, format='multipart')
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
