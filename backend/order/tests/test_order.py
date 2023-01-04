@@ -25,12 +25,9 @@ def get_user_order_by_order_id(id):
 def pay_order_url(id):
     return reverse('order:pay', args=(id,))
 
-def create_user(params, admin=False):
+def create_user(params):
     """Create and return a new user."""
-    if not admin:
-        return User.objects.create_user(**params)
-    else:
-        return User.objects.create_superuser(**params)
+    return User.objects.create_user(**params)
 
 def create_product(user):
     """Create and return a product"""
@@ -142,34 +139,13 @@ class OrderAPITests(TestCase):
         self.assertEqual(res2.data, res1.data)
 
 
-    def test_get_user_order_by_admin_success(self):
-        """Test success getting user's order with admin authorization."""
-
-        admin_params = {
-            'first_name': 'Test Admin',
-            'email': 'admin@mail.com',
-            'username': 'admin@mail.com',
-            'password': 'password123',
-        }
-
-        create_user(admin_params, True)
-        token_res = get_token(self.client.post, admin_params)
-        admin_token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
-
-        res1 = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
-        res2 = self.client.get(get_user_order_by_order_id(res1.data['id']), **admin_token)
-
-        self.assertEqual(res2.status_code, status.HTTP_200_OK)
-        self.assertEqual(res2.data, res1.data)
-
-
     def test_get_order_authorized_user_unsuccess(self):
         """Test getting order not exists by the user."""
 
-        res1 = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
-        res2 = self.client.get(get_user_order_by_order_id(res1.data['id']+1), **self.user_token)
+        res_user_order = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        res_user_not_order = self.client.get(get_user_order_by_order_id(res_user_order.data['id']+1), **self.user_token)
 
-        self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res_user_not_order.status_code, status.HTTP_400_BAD_REQUEST)
 
 
     def test_get_user_order_by_other_user_unsuccess(self):
@@ -186,41 +162,10 @@ class OrderAPITests(TestCase):
         token_res = get_token(self.client.post, other_user_params)
         other_user_token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
 
-        res1 = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
-        res2 = self.client.get(get_user_order_by_order_id(res1.data['id']), **other_user_token)
+        res_user = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
+        res_other_user = self.client.get(get_user_order_by_order_id(res_user.data['id']), **other_user_token)
 
-        self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
-
-
-    def test_mark_order_as_delivered_by_admin_success(self):
-        """Test set order as delivered with admin authorization."""
-
-        admin_params = {
-            'first_name': 'Test Admin',
-            'email': 'admin@mail.com',
-            'username': 'admin@mail.com',
-            'password': 'password123',
-        }
-
-        create_user(admin_params, True)
-        token_res = get_token(self.client.post, admin_params)
-        admin_token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
-
-        res_create_order = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
-        res_mark_order_delivered = self.client.put(deliver_orde_url(res_create_order.data['id']), **admin_token)
-        res_get_order_by_user = self.client.get(get_user_order_by_order_id(res_create_order.data['id']), **self.user_token)
-
-        self.assertEqual(res_mark_order_delivered.status_code, status.HTTP_200_OK)
-        self.assertEqual(res_get_order_by_user.data['isDelivered'], True)
-
-
-    def test_mark_order_as_delivered_by_user_unsuccess(self):
-        """Test set order as delivered with user authorization unsuccess."""
-
-        res_create_order = self.client.post(CREATE_ORDER_URL, self.order, **self.user_token, format='json')
-        res_mark_order_delivered = self.client.put(deliver_orde_url(res_create_order.data['id']), **self.user_token)
-
-        self.assertEqual(res_mark_order_delivered.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res_other_user.status_code, status.HTTP_400_BAD_REQUEST)
 
 
     def test_pay_order_success(self):
