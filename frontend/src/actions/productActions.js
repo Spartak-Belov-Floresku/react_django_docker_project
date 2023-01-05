@@ -75,8 +75,10 @@ export const listProductsAdmin = () => async (dispatch, getState) => {
             }
         }
 
+        const unactive = localStorage.getItem('unactive')? '?unactive=True': '/'
+
         const {data} = await axios.get(
-                '/api/products/admin/products/',
+                `/api/products/admin/products${unactive}`,
                 config,
             )
         dispatch({

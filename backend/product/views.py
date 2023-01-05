@@ -32,6 +32,8 @@ def getProduct(request, pk):
 @permission_classes([IsAdminUser])
 def getProductsAdmin(request):
     products = Product.objects.all()
+    if request.query_params.get('unactive', False):
+        products = Product.objects.filter(active=False)
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 

@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Table, Button, Row, Col } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
@@ -22,8 +22,7 @@ import {
 
 export default function ProductListScreen() {
 
-    const {keyword} = useParams()
-
+    const [unactive, setUnactive] = useState(false)
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
@@ -48,6 +47,7 @@ export default function ProductListScreen() {
     useEffect(() => {
 
         dispatch({type: PRODUCT_CREATE_RESET})
+        localStorage.getItem('unactive')? setUnactive(true): setUnactive(false)
 
         if(!userInfo || !userInfo.isAdmin){
             navigate('/login')
@@ -64,10 +64,10 @@ export default function ProductListScreen() {
         if(successCreate){
             navigate(`/admin/product/${createdProduct.id}/edit`)
         } else {
-            dispatch(listProductsAdmin(keyword))
+            dispatch(listProductsAdmin())
         }
 
-    },[dispatch, userInfo, userDetails, successDelete, successCreate, keyword])
+    },[dispatch, userInfo, userDetails, successDelete, successCreate ])
 
     const deleteHandler = id => {
         if(window.confirm(`Are you sure? You want to delete this product ${id}`)){
@@ -80,6 +80,19 @@ export default function ProductListScreen() {
         dispatch(createProduct())
     }
 
+    const getUnactiveProducts = () => {
+
+        ! localStorage.getItem('unactive')
+            ? localStorage.setItem('unactive', true)
+            : localStorage.removeItem('unactive')
+
+        localStorage.getItem('unactive')
+            ? setUnactive(true)
+            : setUnactive(false)
+
+        dispatch(listProductsAdmin())
+    }
+
     return (
         <>
             <Row className='align-items-center'>
@@ -87,6 +100,9 @@ export default function ProductListScreen() {
                     <h2>Products</h2>
                 </Col>
                 <Col className='text-end'>
+                    <Button className='my-3 m-3' onClick={getUnactiveProducts}>
+                        <i className={unactive? 'fas fa-plus':'fas fa-minus'}></i> Unactive Products
+                    </Button>
                     <Button className='my-3' onClick={createProductHandler}>
                         <i className='fas fa-plus'></i> Create Product
                     </Button>

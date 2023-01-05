@@ -166,7 +166,7 @@ def getUserById(request, pk):
 def updateUser(request, pk):
     user = User.objects.get(id=pk)
     data  = request.data
-    user.first_name = data.get('name') or user.first_name
+    user.first_name = data.get('name', user.first_name)
 
     try:
         validate_email(data.get('email'))
@@ -176,9 +176,9 @@ def updateUser(request, pk):
         user.username = user.email
         user.email = user.email
 
-    user.is_staff = data.get('isAdmin') or False
+    user.is_staff = data.get('isAdmin', False)
 
-    if bool(data.get('password') or False):
+    if data.get('password', False):
         password, message = validate_password(data.get('password'))
         if not password:
             return Response(message, status=status.HTTP_400_BAD_REQUEST)

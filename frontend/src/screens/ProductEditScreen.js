@@ -132,7 +132,7 @@ export const ProductEditScreen = () => {
                                 <Form.Control
                                     type='text'
                                     placeholder='Enter image'
-                                    value={image}
+                                    value={image? image: 'None'}
                                     onChange={e => setImage(e.target.value)}
                                 >
                                 </Form.Control>
