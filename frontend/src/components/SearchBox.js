@@ -28,7 +28,7 @@ export default function SearchBox() {
                 variant='outline-success'
                 className='ms-2 btn-outline-light'
             >
-                Submint
+                Search
             </Button>
         </Form>
     )

@@ -33,6 +33,7 @@ function App() {
       <Container>
         <Routes>
           <Route exact path='/' element={<HomeScreen />} />
+          <Route path='/:keyword' element={<HomeScreen />} />
           <Route path='/product/:productId' element={<ProductScreen />} />
           <Route exact path='/cart' element={<CartScreen />} />
           <Route path='/cart/:productId/:qty' element={<CartScreen />} />
