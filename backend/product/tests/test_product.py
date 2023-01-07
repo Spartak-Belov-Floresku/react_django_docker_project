@@ -34,15 +34,18 @@ def create_user(data):
     """Create and return a new user."""
     return User.objects.create_superuser(**data)
 
-def create_product(user):
+def create_product(user, params=False):
     """Create and return a product"""
-    product = Product.objects.create(
-        user=user,
-        name='Sample product name',
-        description='Sample product description',
-        price=Decimal('5.50'),
-        active=True,
-    )
+    defaults = {
+        'user': user,
+        'name': 'Sample product name',
+        'description':'Sample product description',
+        'price': Decimal('5.50'),
+        'active': True,
+    }
+    if params:
+        defaults.update(params)
+    product = Product.objects.create(**defaults)
 
     return product
 
@@ -59,7 +62,7 @@ class ProductAPITests(TestCase):
             'password': 'password123',
         }
         self.user = create_user(self.defaults)
-        self.product = create_product(self.user)
+        self.product = create_product(user=self.user)
         self.token = get_token(self.client.post, self.defaults)
 
     def test_retrive_products_success(self):
@@ -70,6 +73,18 @@ class ProductAPITests(TestCase):
 
         self.assertEqual(res_products.status_code, status.HTTP_200_OK)
         self.assertEqual(res_products.data, serializer.data)
+
+
+    def test_search_products_success(self):
+        """Test search for products matching the name."""
+        create_product(user=self.user, params={'name': 'yxz'})
+        res_products_by_serch = self.client.get(ALL_PRODUCTS_URL, {'keyword':'y'})
+
+        products = Product.objects.all().order_by('-id')
+        serializer = ProductSerializer(products, many=True)
+
+        self.assertEqual(res_products_by_serch.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(res_products_by_serch.data, serializer.data)
 
 
     def test_get_product_success(self):

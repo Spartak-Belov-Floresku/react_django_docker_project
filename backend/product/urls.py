@@ -13,6 +13,7 @@ urlpatterns = [
     path('admin/upload/image/', uploadImage, name='admin-upload-image'),
 
     path('<str:pk>/reviews/', createProductReview, name='create-review'),
+    path('top/', getTopProducts, name='top-products'),
     path('<str:pk>/', getProduct, name='product'),
 
     path('create/product/', createProduct, name='create-product'),

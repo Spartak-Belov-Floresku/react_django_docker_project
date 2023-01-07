@@ -5,31 +5,35 @@ import { Row, Col } from 'react-bootstrap'
 import Product from '../components/Product'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
+import Paginate from '../components/Paginate';
 import { listProducts } from '../actions/productActions'
+import { ProductCarousel } from '../components/ProductCarousel'
 
 export default function HomeScreen() {
 
     const {keyword} = useParams()
+
     const dispatch = useDispatch()
+    const { error, loading, products, page, pages } = useSelector( state => state.productList )
 
-    const { error, loading, products } = useSelector( state => state.productList )
-
-    useEffect(() => {
-      dispatch(listProducts(keyword))
-    }, [dispatch, keyword])
+    useEffect(() => {dispatch(listProducts(keyword))}, [dispatch, keyword])
 
     return (
         <div>
-            <h3>Lates Products</h3>
+            {!keyword && <ProductCarousel />}
+            <h3>Lates Products:</h3>
             { loading ? <Loader/>
                 : error ? <Message variant='danger'>{error}</Message>
-                    : <Row>
-                        { products.map(product => (
-                            <Col key={product.id} sm={12} md={6} lg={4} xl={3}>
-                                <Product product={product}/>
-                            </Col>
-                        ))}
-                    </Row>
+                    :   <>
+                            <Row>
+                                { products.map(product => (
+                                    <Col key={product.id} sm={12} md={6} lg={4} xl={3}>
+                                        <Product product={product}/>
+                                    </Col>
+                                )) }
+                            </Row>
+                            <Paginate page={page} pages={pages} keyword={keyword}/>
+                        </>
             }
         </div>
     )

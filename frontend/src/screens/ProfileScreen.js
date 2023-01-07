@@ -44,7 +44,7 @@ export default function ProfileScreen() {
         if(errorProfile == 'Given token not valid for any token type')
             dispatch(logout())
 
-    }, [dispatch, userInfo, userProfile, success, loadingOrders])
+    }, [dispatch, navigate, userInfo, userProfile, success])
 
     const submitHandler = e => {
         e.preventDefault()

@@ -34,22 +34,37 @@ import {
     PRODUCT_CREATE_REVIEW_FAIL,
     PRODUCT_CREATE_REVIEW_RESET,
 
+    PRODUCT_TOP_REQUEST,
+    PRODUCT_TOP_SUCCESS,
+    PRODUCT_TOP_FAIL,
 } from '../constants/productConstants'
 
-export const productListReducers = (state={products: []}, action) => {
+export const productListReducer = (state={products:[]}, action) => {
     switch(action.type){
         case PRODUCT_LIST_REQUEST:
-            return { loading: true, products: [] }
+            return {
+                loading: true,
+                products: []
+            }
         case PRODUCT_LIST_SUCCESS:
-            return { loading: false, products: action.payload }
+            return {
+                loading: false,
+                products: action.payload.products,
+                page: action.payload.page,
+                pages: action.payload.pages,
+            }
         case PRODUCT_LIST_FAIL:
-            return { loading: false, error: action.payload }
+            return {
+                loading: false,
+                error: action.payload
+            }
         default:
             return state
+
     }
 }
 
-export const productAdminListReducers = (state={products: []}, action) => {
+export const productAdminListReducer = (state={products: []}, action) => {
     switch(action.type){
         case PRODUCT_ADMIN_LIST_REQUEST:
             return { loading: true, products: [] }
@@ -170,6 +185,29 @@ export const productReviewCreateReducer = (state={}, action) => {
             }
         case PRODUCT_CREATE_REVIEW_RESET:
             return {}
+        default:
+            return state
+
+    }
+}
+
+export const productTopRatedReducer = (state={ products: []}, action) => {
+    switch(action.type){
+        case PRODUCT_TOP_REQUEST:
+            return {
+                loading: true,
+                products: [],
+            }
+        case PRODUCT_TOP_SUCCESS:
+            return {
+                loading: false,
+                products: action.payload,
+            }
+        case PRODUCT_TOP_FAIL:
+            return {
+                loading: false,
+                error: action.payload
+            }
         default:
             return state
 
