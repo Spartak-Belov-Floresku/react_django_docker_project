@@ -72,7 +72,7 @@ class ProductAPITests(TestCase):
         serializer = ProductSerializer(products, many=True)
 
         self.assertEqual(res_products.status_code, status.HTTP_200_OK)
-        self.assertEqual(res_products.data, serializer.data)
+        self.assertEqual(res_products.data['products'], serializer.data)
 
 
     def test_search_products_success(self):
