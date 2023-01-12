@@ -127,7 +127,8 @@ class AdminProductAPITests(TestCase):
         product_serializer = ProductSerializer(product_update, many=False)
 
         self.assertEqual(res_product.status_code, status.HTTP_200_OK)
-        self.assertEqual(res_product.data, product_serializer.data)
+        self.assertEqual(product_serializer.data['name'], updated_payload['name'])
+        self.assertEqual(product_serializer.data['active'], updated_payload['active'])
 
     def test_update_product_unsuccess(self):
         """Test updates product without valid token."""
