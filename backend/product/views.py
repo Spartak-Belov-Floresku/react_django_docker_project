@@ -3,22 +3,22 @@ Views for the product APIs
 """
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.viewsets import ViewSet, GenericViewSet
+from rest_framework.viewsets import ViewSet, GenericViewSet, ModelViewSet
+from rest_framework.decorators import action
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 
 from core.models import Product, Review
 from .serializers import ProductSerializer, ProductImageSerializer
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+class ProductViewSet(ModelViewSet):
+    serializer_class = ProductSerializer
 
-class Products(ViewSet):
-
-    def get_products(self, request):
+    def list(self, request):
         query = request.query_params.get('keyword', False)
         products = Product.objects.filter(active=True, name__icontains=query) if query else Product.objects.filter(active=True)
-
         page = request.query_params.get('page')
         paginator = Paginator(products, 4)
 
@@ -34,27 +34,27 @@ class Products(ViewSet):
         except:
             page = 1
 
-        serializer = ProductSerializer(products, many=True)
-
+        serializer = self.serializer_class(products, many=True)
         return Response({
                 'products': serializer.data,
                 'page': page,
                 'pages': paginator.num_pages,
             })
 
-    def get_top_products(self, request):
-        products = Product.objects.filter(rating__gte=4, active=True).order_by('-rating')[0:5]
-        serializer = ProductSerializer(products,many=True)
-        return Response(serializer.data)
-
-    def get_product(self, request, pk):
+    def retrieve(self, request, pk=None):
         try:
             product = Product.objects.get(id=pk)
-            serializer = ProductSerializer(product, many=False)
+            serializer =self.serializer_class(product, many=False)
             return Response(serializer.data)
         except:
             message = {'detail': 'Product doesn\'t exist!'}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["get"], url_path=r'top')
+    def top_products(self, request):
+        products = Product.objects.filter(rating__gte=4, active=True).order_by('-rating')[0:5]
+        serializer = self.serializer_class(products,many=True)
+        return Response(serializer.data)
 
 
 class AdminProducts(GenericViewSet):
