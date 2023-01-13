@@ -81,7 +81,7 @@ export const listProductsAdmin = () => async (dispatch, getState) => {
         const unactive = localStorage.getItem('unactive')? '?unactive=True': '/'
 
         const {data} = await axios.get(
-                `/api/products/admin/products${unactive}`,
+                `/api/products/admin/list/products${unactive}`,
                 config,
             )
         dispatch({
@@ -163,7 +163,7 @@ export const deleteProduct = id => async (dispatch, getState) => {
         }
 
             await axios.delete(
-                `/api/products/delete/product/${id}/`,
+                `/api/products/admin/delete/product/${id}/`,
                 config,
             )
 
@@ -200,7 +200,7 @@ export const createProduct = () => async (dispatch, getState) => {
         }
 
             const { data } = await axios.post(
-                `/api/products/create/product/`,
+                `/api/products/admin/create/product/`,
                 {},
                 config,
             );
@@ -238,7 +238,7 @@ export const updateProduct = product => async (dispatch, getState) => {
         }
 
         const {data} = await axios.put(
-            `/api/products/update/product/${product.id}/`,
+            `/api/products/admin/update/product/${product.id}/`,
             product,
             config
         );
@@ -282,7 +282,7 @@ export const uploadProductImage = formData => async (dispatch, getState) => {
         }
 
         const {data} = await axios.post(
-            '/api/products/admin/upload/image/',
+            '/api/products/admin/image/product/',
             formData,
             config,
         );
@@ -319,8 +319,8 @@ export const createProductReview = (productId, review) => async (dispatch, getSt
             }
         }
 
-        const {data} = await axios.post(
-            `/api/products/${productId}/reviews/`,
+        const {data} = await axios.patch(
+            `/api/products/user/reviews/product/${productId}/`,
             review,
             config
         );
