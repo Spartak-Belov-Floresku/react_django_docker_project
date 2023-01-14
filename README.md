@@ -13,7 +13,7 @@
 
 #### To install the application on a local server is necessary.
 - Clone the code.
-- In bash run commands ```docker build .```, ```docker-compose build```.
+- In bash run commands ```docker build .```, ```docker-compose build```, ```docker-compose up```.
 - In bash go to frontend and run the commands ```npm install```, ```npm start```
 - The application will run on your local server for frontend ```http://localhost:3000``` for a backend  ```http://localhost:8000/admin```
 
