@@ -1,4 +1,4 @@
-# React/Redux/Python/Django SPA that allows users to simulate e-commerce
+# React/Redux/Django/Python SPA that allows users to simulate e-commerce
 
 # [GameLand SPA test demo version](https://ambercity-demo.herokuapp.com/)
 
