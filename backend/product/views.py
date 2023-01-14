@@ -2,7 +2,7 @@
 Views for the product APIs
 """
 from rest_framework.response import Response
-from rest_framework.viewsets import ViewSet, ModelViewSet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -106,7 +106,7 @@ class AdminProductViewSet(ModelViewSet):
             product.image = request.FILES.get('image')
             product.save()
             return Response('Image was uploaded', status=status.HTTP_200_OK)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

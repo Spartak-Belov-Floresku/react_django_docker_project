@@ -19,6 +19,7 @@ from core.models import Product
 from product.serializers import ProductSerializer
 
 TOKEN_URL = reverse('user:user-token')
+HTTP_ADMIN_PRODUCTS = '/api/products/admin'
 
 def update_product_url(id):
     """Update product url."""
@@ -80,14 +81,14 @@ class AdminProductAPITests(TestCase):
 
     def test_get_products_by_admin_success(self):
         """Test get all products using admin authentication."""
-        res_product = self.client.get('/api/products/admin/list/products/', **self.token_admin)
+        res_product = self.client.get(f'{HTTP_ADMIN_PRODUCTS}/list/products/', **self.token_admin)
 
         self.assertEqual(res_product.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res_product.data), 1)
 
     def test_get_products_by_admin_unsuccess(self):
         """Test get all products without admin authentication."""
-        res_product = self.client.get('/api/products/admin/list/products/', **self.token_user)
+        res_product = self.client.get(f'{HTTP_ADMIN_PRODUCTS}/list/products/', **self.token_user)
 
         self.assertEqual(res_product.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -97,14 +98,14 @@ class AdminProductAPITests(TestCase):
         create_product(self.admin, True)
         create_product(self.admin, True)
         create_product(self.admin, False)
-        res_product = self.client.get('/api/products/admin/list/products/', {'unactive': True}, **self.token_admin)
+        res_product = self.client.get(f'{HTTP_ADMIN_PRODUCTS}/list/products/', {'unactive': True}, **self.token_admin)
 
         self.assertEqual(res_product.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res_product.data), 2)
 
     def test_create_product_success(self):
         """Test creates product."""
-        res_product = self.client.post('/api/products/admin/create/product/', **self.token_admin)
+        res_product = self.client.post(f'{HTTP_ADMIN_PRODUCTS}/create/product/', **self.token_admin)
         product_exists = Product.objects.filter(id=res_product.data['id']).exists()
 
         self.assertEqual(res_product.status_code, status.HTTP_200_OK)
@@ -112,7 +113,7 @@ class AdminProductAPITests(TestCase):
 
     def test_create_product_unsuccess(self):
         """Test creates product without valid token."""
-        res_product = self.client.post('/api/products/admin/create/product/', **self.token_user)
+        res_product = self.client.post(f'{HTTP_ADMIN_PRODUCTS}/create/product/', **self.token_user)
 
         self.assertEqual(res_product.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -124,7 +125,7 @@ class AdminProductAPITests(TestCase):
         updated_payload['name'] = 'Updated Name'
         updated_payload['active'] = True
 
-        res_product = self.client.put(f'/api/products/admin/update/product/{self.product.id}/', updated_payload, **self.token_admin, format='json')
+        res_product = self.client.put(f'{HTTP_ADMIN_PRODUCTS}/update/product/{self.product.id}/', updated_payload, **self.token_admin, format='json')
         product_update = Product.objects.get(id=self.product.id)
         product_serializer = ProductSerializer(product_update, many=False)
 
@@ -139,14 +140,14 @@ class AdminProductAPITests(TestCase):
 
         updated_payload['name'] = 'Updated Name'
 
-        res_product = self.client.put(f'/api/products/admin/update/product/{self.product.id}/', updated_payload, **self.token_user, format='json')
+        res_product = self.client.put(f'{HTTP_ADMIN_PRODUCTS}/update/product/{self.product.id}/', updated_payload, **self.token_user, format='json')
 
         self.assertEqual(res_product.status_code, status.HTTP_403_FORBIDDEN)
 
 
     def test_delete_product_success(self):
         """Test deletes product."""
-        res_product_deleted = self.client.delete(f'/api/products/admin/delete/product/{self.product.id}/', **self.token_admin)
+        res_product_deleted = self.client.delete(f'{HTTP_ADMIN_PRODUCTS}/delete/product/{self.product.id}/', **self.token_admin)
         product_exists = Product.objects.filter(id=self.product.id).exists()
 
         self.assertEqual(res_product_deleted.status_code, status.HTTP_200_OK)
@@ -155,7 +156,7 @@ class AdminProductAPITests(TestCase):
 
     def test_delete_product_unsuccess(self):
         """Test ubsuccessful deletes product."""
-        res_product_deleted = self.client.delete(f'/api/products/admin/delete/product/{self.product.id}/', **self.token_user)
+        res_product_deleted = self.client.delete(f'{HTTP_ADMIN_PRODUCTS}/delete/product/{self.product.id}/', **self.token_user)
 
         self.assertEqual(res_product_deleted.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -182,7 +183,7 @@ class ImageUploadTests(TestCase):
             img.save(image_file, format='JPEG')
             image_file.seek(0)
             payload = {'image': image_file, 'product_id': self.product.id}
-            res = self.client.post('/api/products/admin/image/product/', payload, **self.token_admin, fromat='multipart')
+            res = self.client.post(f'{HTTP_ADMIN_PRODUCTS}/image/product/', payload, **self.token_admin, fromat='multipart')
 
         self.product.refresh_from_db()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -197,7 +198,7 @@ class ImageUploadTests(TestCase):
             img.save(image_file, format='JPEG')
             image_file.seek(0)
             payload = {'image': image_file, 'product_id': self.product.id}
-            res = self.client.post('/api/products/admin/image/product/', payload, **self.token_admin, fromat='multipart')
+            res = self.client.post(f'{HTTP_ADMIN_PRODUCTS}/image/product/', payload, **self.token_admin, fromat='multipart')
 
         self.product.refresh_from_db()
         old_path = self.product.image.path
@@ -207,7 +208,7 @@ class ImageUploadTests(TestCase):
             new_img.save(new_image_file, format='JPEG')
             new_image_file.seek(0)
             payload = {'image': new_image_file, 'product_id': self.product.id}
-            res = self.client.post('/api/products/admin/image/product/', payload, **self.token_admin, fromat='multipart')
+            res = self.client.post(f'{HTTP_ADMIN_PRODUCTS}/image/product/', payload, **self.token_admin, fromat='multipart')
 
         self.product.refresh_from_db()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -217,7 +218,7 @@ class ImageUploadTests(TestCase):
     def test_upload_image_bad_request(self):
         """Test uploading invalid image."""
         payload = {'iamge': 'string', 'product_id': self.product.id}
-        res = self.client.post('/api/products/admin/image/product/', payload, **self.token_admin, format='multipart')
+        res = self.client.post(f'{HTTP_ADMIN_PRODUCTS}/image/product/', payload, **self.token_admin, format='multipart')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -228,6 +229,6 @@ class ImageUploadTests(TestCase):
             img.save(image_file, format='JPEG')
             image_file.seek(0)
             payload = {'image': image_file, 'product_id': self.product.id}
-            res = self.client.post('/api/products/admin/image/product/', payload, **self.token_user, fromat='multipart')
+            res = self.client.post(f'{HTTP_ADMIN_PRODUCTS}/image/product/', payload, **self.token_user, fromat='multipart')
 
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
