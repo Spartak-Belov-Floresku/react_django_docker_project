@@ -14,6 +14,10 @@
 #### To install the application on a local server is necessary.
 - Clone the code.
 - In bash run commands ```docker build .```, ```docker-compose build```, ```docker-compose up```.
+- To run tests ```docker-compose run --rm backend sh -c "python manage.py test"```
+- To upload tests products ```docker-compose run --rm backend sh -c "python manage.py loaddata products"```
+- To create super user ```docker-compose run --rm backend sh -c "python manage.py createsuperuser"```
+- To stop server ```docker-compose down```
 - In bash go to frontend and run the commands ```npm install```, ```npm start```
 - The application will run on your local server for frontend ```http://localhost:3000``` for a backend  ```http://localhost:8000/admin```
 
