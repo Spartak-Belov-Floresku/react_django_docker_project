@@ -16,7 +16,7 @@ export default function HomeScreen() {
     const dispatch = useDispatch()
     const { error, loading, products, page, pages } = useSelector( state => state.productList )
 
-    useEffect(() => {dispatch(listProducts(keyword))}, [dispatch, keyword])
+    useEffect(() => {dispatch(listProducts(`user/${keyword}`))}, [dispatch, keyword])
 
     return (
         <div>

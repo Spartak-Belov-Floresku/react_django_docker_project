@@ -59,103 +59,8 @@ class UserProductViewSet(ModelViewSet):
         return Response(serializer.data)
 
 
-class AdminProductViewSet(ModelViewSet):
-    """Admin access to the products."""
-
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = (IsAdminUser,)
-
-    @action(detail=False, methods=["get"], url_path=r'list/products')
-    def products_list(self, request):
-        products = self.queryset.filter(active=False) if request.query_params.get('unactive', False) else Product.objects.all()
-        serializer = self.serializer_class(products, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=["post"], url_path=r'create/product')
-    def create_product(self, request):
-        try:
-            user = request.user
-
-            product = self.queryset.create(
-                user=user,
-                name='Sample Name',
-                price=0,
-                brand='Sample Brand',
-                countInStock=0,
-                category='Sample Category',
-                description=''
-            )
-
-            serializer = self.get_serializer(product, many=False)
-            return Response(serializer.data)
-        except:
-            message = {'detail': 'Product cannot be created.'}
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=False, methods=["post"], url_path=r'image/product')
-    def upload_image(self, request):
-
-        data = request.data
-        product_id = data['product_id']
-        product = self.queryset.get(id=product_id)
-        serializer = ProductImageSerializer(product, data=request.data)
-
-        if serializer.is_valid():
-            product.image.delete()
-            product.image = request.FILES.get('image')
-            product.save()
-            return Response('Image was uploaded', status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class AdminUpdateProductViewSet(ModelViewSet):
-    """Admin update the product."""
-
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = (IsAdminUser,)
-    http_method_names = ['put', ]
-
-    def update(self, request, pk=None, *args, **kwargs):
-        data = request.data
-        product = self.queryset.get(id=pk)
-
-        product.name = data.get('name')
-        product.price = data.get('price')
-        product.brand = data.get('brand')
-        product.countInStock = data.get('countInStock')
-        product.category = data.get('category')
-        product.description = data.get('description')
-        product.active = data.get('active') or False
-
-        product.save()
-
-        serializer = self.get_serializer(product, many=False)
-        return Response(serializer.data)
-
-
-class AdminDeleteProductViewSet(ModelViewSet):
-    """Admin delete the product."""
-
-    queryset = Product.objects.all()
-    permission_classes = (IsAdminUser,)
-    http_method_names = ['delete', ]
-
-    def destroy(self, request, pk=None):
-        product = self.queryset.get(id=pk)
-        reviews = Review.objects.filter(product=product)
-        if bool(len(reviews)):
-            for review in reviews:
-                review.delete()
-        product.image.delete()
-        product.delete()
-
-        return Response('Product Deleted')
-
 class UserReveiwProductSet(ModelViewSet):
-    """Users review of the product."""
+    """User reviews the product."""
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -198,3 +103,82 @@ class UserReveiwProductSet(ModelViewSet):
             product.save()
 
             return Response('Reviewed.')
+
+
+class AdminProductViewSet(ModelViewSet):
+    """Admin the products class."""
+
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = (IsAdminUser,)
+    http_method_names = ['get', 'post', 'put', 'delete' ]
+
+    def list(self, request):
+        self.queryset = self.queryset.all()
+        products = self.queryset.filter(active=False) if request.query_params.get('unactive', False) else self.queryset
+        serializer = self.serializer_class(products, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        try:
+            user = request.user
+
+            product = self.queryset.create(
+                user=user,
+                name='Sample Name',
+                price=0,
+                brand='Sample Brand',
+                countInStock=0,
+                category='Sample Category',
+                description=''
+            )
+
+            serializer = self.get_serializer(product, many=False)
+            return Response(serializer.data)
+        except:
+            message = {'detail': 'Product cannot be created.'}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, pk=None, *args, **kwargs):
+        data = request.data
+        product = self.queryset.get(id=pk)
+
+        product.name = data.get('name')
+        product.price = data.get('price')
+        product.brand = data.get('brand')
+        product.countInStock = data.get('countInStock')
+        product.category = data.get('category')
+        product.description = data.get('description')
+        product.active = data.get('active') or False
+
+        product.save()
+
+        serializer = self.get_serializer(product, many=False)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["post"], url_path=r'image')
+    def upload_image(self, request):
+
+        data = request.data
+        product_id = data['product_id']
+        product = self.queryset.get(id=product_id)
+        serializer = ProductImageSerializer(product, data=request.data)
+
+        if serializer.is_valid():
+            product.image.delete()
+            product.image = request.FILES.get('image')
+            product.save()
+            return Response('Image was uploaded', status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk=None):
+        product = self.queryset.get(id=pk)
+        reviews = Review.objects.filter(product=product)
+        if bool(len(reviews)):
+            for review in reviews:
+                review.delete()
+        product.image.delete()
+        product.delete()
+
+        return Response('Product Deleted')

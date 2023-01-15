@@ -39,7 +39,9 @@ import {
 
 export const listProducts = (keyword='') => async (dispatch) => {
 
-    const query = keyword? `?${keyword}`: '';
+    const arr_keywords = keyword.split("/")
+
+    const query = arr_keywords[1]? `${arr_keywords[0]}/?${arr_keywords[1]}`: arr_keywords[0]+'/';
 
     try{
         dispatch({
@@ -81,7 +83,7 @@ export const listProductsAdmin = () => async (dispatch, getState) => {
         const unactive = localStorage.getItem('unactive')? '?unactive=True': '/'
 
         const {data} = await axios.get(
-                `/api/products/admin/list/products${unactive}`,
+                `/api/products/admin${unactive}`,
                 config,
             )
         dispatch({
@@ -106,7 +108,7 @@ export const listTopProducts = () => async (dispatch) => {
     try{
         dispatch({type: PRODUCT_TOP_REQUEST});
 
-        const { data } = await axios.get(`/api/products/top/`);
+        const { data } = await axios.get(`/api/products/user/top/`);
 
         dispatch({
             type: PRODUCT_TOP_SUCCESS,
@@ -128,7 +130,7 @@ export const listProductDetails = id => async (dispatch) => {
         dispatch({
             type: PRODUCT_DETAILS_REQUEST,
         })
-        const {data} = await axios.get(`/api/products/${id}/`)
+        const {data} = await axios.get(`/api/products/user/${id}/`)
         dispatch({
             type: PRODUCT_DETAILS_SUCCESS,
             payload: data,
@@ -163,7 +165,7 @@ export const deleteProduct = id => async (dispatch, getState) => {
         }
 
             await axios.delete(
-                `/api/products/admin/delete/product/${id}/`,
+                `/api/products/admin/${id}/`,
                 config,
             )
 
@@ -200,7 +202,7 @@ export const createProduct = () => async (dispatch, getState) => {
         }
 
             const { data } = await axios.post(
-                `/api/products/admin/create/product/`,
+                `/api/products/admin/`,
                 {},
                 config,
             );
@@ -238,7 +240,7 @@ export const updateProduct = product => async (dispatch, getState) => {
         }
 
         const {data} = await axios.put(
-            `/api/products/admin/update/product/${product.id}/`,
+            `/api/products/admin/${product.id}/`,
             product,
             config
         );
@@ -282,7 +284,7 @@ export const uploadProductImage = formData => async (dispatch, getState) => {
         }
 
         const {data} = await axios.post(
-            '/api/products/admin/image/product/',
+            '/api/products/admin/image/',
             formData,
             config,
         );
@@ -320,7 +322,7 @@ export const createProductReview = (productId, review) => async (dispatch, getSt
         }
 
         const {data} = await axios.patch(
-            `/api/products/user/reviews/product/${productId}/`,
+            `/api/products/user/reviews/${productId}/`,
             review,
             config
         );

@@ -55,7 +55,7 @@ export default function ProductListScreen() {
 
         if(userInfo){
             if(typeof userDetails !== 'object' || !Object.keys(userDetails).length)
-                dispatch(getUserDetails('profile'))
+                dispatch(getUserDetails('details/profile'))
             if(errorDetails == 'Given token not valid for any token type'){
                 dispatch(logout())
             }
