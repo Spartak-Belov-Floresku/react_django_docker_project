@@ -234,7 +234,7 @@ export const saveUserAddress = userAddress => async (dispatch, getState) => {
         }
 
         const {data} = await axios.post(
-                `/api/users/address/create/`,
+                `/api/users/address/`,
                 {
                     'address': userAddress['address'],
                     'city': userAddress['city'],
@@ -284,7 +284,7 @@ export const updateUserProfile = user => async (dispatch, getState) => {
         }
 
         const {data} = await axios.put(
-                `/api/users/profile/update/`,
+                `/api/users/details/update/`,
                 user,
                 config,
             )
@@ -330,7 +330,7 @@ export const listUsers = () => async (dispatch, getState) => {
         }
 
         const {data} = await axios.get(
-                `/api/users/`,
+                `/api/users/admin/`,
                 config,
             )
 
@@ -368,7 +368,7 @@ export const deleteUser = id => async (dispatch, getState) => {
         }
 
         await axios.delete(
-                `/api/users/delete/${id}/`,
+                `/api/users/admin/${id}/`,
                 config,
             )
 
@@ -405,7 +405,7 @@ export const updateUser = user => async (dispatch, getState) => {
         }
 
         const {data} = await axios.put(
-                `/api/users/update/${user.id}/`,
+                `/api/users/admin/${user.id}/`,
                 user,
                 config,
             )

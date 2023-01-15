@@ -31,7 +31,7 @@ export default function ProfileScreen() {
         }else{
             if(!userProfile || !userProfile.name || success || userInfo.id !== userProfile.id){
                 dispatch({type: USER_UPDATE_PROFILE_RESET})
-                dispatch(getUserDetails('profile'))
+                dispatch(getUserDetails('details/profile'))
                 dispatch(listMyOrders())
                 setPassword('')
                 setConfirmPassword('')

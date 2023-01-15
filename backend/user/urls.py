@@ -1,21 +1,20 @@
 """
 URL mapping for user app.
 """
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
 from user.views import *
 
 app_name = 'user'
 
+router = DefaultRouter()
+router.register("admin", AdminUserViewSet, basename="admin-user")
+router.register("register", UserRegisterViewSet, basename="register-user")
+router.register("details", UserViewSet, basename="user-details")
+router.register("address", UserAddressViewSet, basename="user-address")
+
 urlpatterns = [
-    path('login/', MyTokenObtainPairView.as_view(), name='user-token'),
-    path('register/', registerUser, name='register'),
-    path('profile/', getUserProfile, name='user-profile'),
-    path('profile/update/', updateUserProfile, name='user-profile-update'),
-    path('address/', getUserAddress, name='user-address'),
-    path('address/create/', createUserAddress, name='user-address-create'),
-    path('', getUsers, name='users'),
-    path('<str:pk>/', getUserById, name='user'),
-    path('update/<str:pk>/', updateUser, name='user-update'),
-    path('delete/<str:pk>/', deleteUser, name='user-delete'),
+    path("login/", MyTokenObtainPairView.as_view(), name='user-token'),
+    path('', include(router.urls))
 ]

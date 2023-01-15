@@ -39,7 +39,7 @@ export default function UserEditScreen() {
         }else{
             if(!user.name || user.id !== Number(userId)){
                 dispatch({type: USER_UPDATE_RESET})
-                dispatch(getUserDetails(userId))
+                dispatch(getUserDetails(`admin/${userId}`))
             }else{
                 setName(user.name)
                 setEmail(user.email)
