@@ -17,6 +17,7 @@ class UserProductViewSet(ModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    http_method_names = ['get', ]
 
     def list(self, request):
         query = request.query_params.get('keyword', False)
@@ -53,7 +54,7 @@ class UserProductViewSet(ModelViewSet):
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=["get"], url_path=r'top')
-    def top_products(self, request):
+    def top(self, request):
         products = self.queryset.filter(rating__gte=4, active=True).order_by('-rating')[0:5]
         serializer = self.serializer_class(products,many=True)
         return Response(serializer.data)
@@ -106,7 +107,7 @@ class UserReveiwProductSet(ModelViewSet):
 
 
 class AdminProductViewSet(ModelViewSet):
-    """Admin the products class."""
+    """Admin products class."""
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer

@@ -41,7 +41,7 @@ export const listProducts = (keyword='') => async (dispatch) => {
 
     const arr_keywords = keyword.split("/")
 
-    const query = arr_keywords[1]? `${arr_keywords[0]}/?${arr_keywords[1]}`: arr_keywords[0]+'/';
+    const query = arr_keywords[1] !== 'undefined'? `${arr_keywords[0]}/?${arr_keywords[1]}`: arr_keywords[0]+'/';
 
     try{
         dispatch({

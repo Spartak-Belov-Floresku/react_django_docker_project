@@ -194,7 +194,7 @@ export const getUserAddressDetails = () => async (dispatch, getState) => {
         }
 
         const {data} = await axios.get(
-                `/api/users/address/`,
+                `/api/users/address/retrieve/`,
                 config,
             )
 
@@ -233,8 +233,8 @@ export const saveUserAddress = userAddress => async (dispatch, getState) => {
             }
         }
 
-        const {data} = await axios.post(
-                `/api/users/address/`,
+        const {data} = await axios.patch(
+                `/api/users/address/update/`,
                 {
                     'address': userAddress['address'],
                     'city': userAddress['city'],

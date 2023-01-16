@@ -12,11 +12,8 @@ from rest_framework.test import APIClient
 from user.serializers import *
 
 TOKEN_URL = reverse('user:user-token')
-REGESTER_USER_URL = reverse('user:register')
-PROFILE_URL = reverse('user:user-profile')
-UPDATE_PROFILE_URL = reverse('user:user-profile-update')
-GET_USER_ADDRESS = reverse('user:user-address')
-CREATE_USER_ADDRESS = reverse('user:user-address-create')
+USER_URL = '/api/users/'
+USER_ADDRESS = '/api/users/address/'
 
 def create_user(params):
     """Create and return a new user."""
@@ -38,26 +35,24 @@ class UserAPITests(TestCase):
         self.client = APIClient()
         self.payload = {
             'first_name': 'Test Name',
-            'email': 'test@mail.com',
-            'username': 'test@mail.com',
+            'email': 'user1@mail.com',
+            'username': 'user1@mail.com',
             'password': 'password123',
         }
         self.user = create_user(self.payload)
-
 
     def test_create_user_success(self):
         """Test creating a new user."""
         payload = {
             'name': 'Name',
-            'email': 'test2@mail.com',
+            'email': 'user2@mail.com',
             'password': 'password123',
         }
-        res = self.client.post(REGESTER_USER_URL, payload, format='json')
+        res_user = self.client.post(f'{USER_URL}register/', payload, format='json')
         user_exists = User.objects.filter(email__exact=payload['email']).exists()
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_user.status_code, status.HTTP_200_OK)
         self.assertTrue(user_exists)
-
 
     def test_create_user_invalid_email(self):
         """Test creating a new user with an invalid email."""
@@ -66,10 +61,9 @@ class UserAPITests(TestCase):
             'email': 'some_email',
             'password': 'password123',
         }
-        res = self.client.post(REGESTER_USER_URL, payload, format='json')
+        res_user = self.client.post(f'{USER_URL}register/', payload, format='json')
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-
+        self.assertEqual(res_user.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_password_too_short_error(self):
         """Test an error is returned if password less than 8 chars."""
@@ -78,28 +72,25 @@ class UserAPITests(TestCase):
             'name': 'Test Name',
             'password': 'short',
         }
-        res = self.client.post(REGESTER_USER_URL, payload)
+        res_user = self.client.post(f'{USER_URL}register/', payload)
         user_exists = User.objects.filter(email=payload['email']).exists()
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res_user.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(user_exists)
-
 
     def test_create_user_with_email_already_exists(self):
         """Test creating user with email that already exists"""
-        res = self.client.post(REGESTER_USER_URL, self.payload, format='json')
+        res_user = self.client.post(f'{USER_URL}register/', self.payload, format='json')
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(res.data['detail'], 'User with this eamil already exists')
-
+        self.assertEqual(res_user.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res_user.data['detail'], 'User with this eamil already exists')
 
     def test_create_token_for_user(self):
         """Test generates token for valid credentials."""
-        res = get_token(self.client.post, self.payload)
+        res_token = get_token(self.client.post, self.payload)
 
-        self.assertIn('token', res.data)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-
+        self.assertIn('token', res_token.data)
+        self.assertEqual(res_token.status_code, status.HTTP_200_OK)
 
     def test_create_token_invalid_credentials(self):
         """Test returns error if credentials invalid."""
@@ -107,63 +98,73 @@ class UserAPITests(TestCase):
             'email': 'none@mail.com',
             'password': 'testpassword',
             }
-        res = get_token(self.client.post, payload)
+        res_token = get_token(self.client.post, payload)
 
-        self.assertNotIn('token', res.data)
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn('token', res_token.data)
+        self.assertEqual(res_token.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_get_user_profile_success(self):
+        """Test get user profile."""
+        res_token = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {res_token.data.get("token")}'}
+        res_user = self.client.get(f'{USER_URL}details/profile/', **token, format='json')
+
+        self.assertEqual(res_user.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_user.data['email'], self.payload['email'])
+
+    def test_retrieve_user_profile_unathorized(self):
+        """Test authentication is required for user."""
+        res = self.client.get(f'{USER_URL}details/profile/')
+
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_user_profile_success(self):
         """Test update user profile."""
-        res = get_token(self.client.post, self.payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res.data.get("token")}'}
+        res_token = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {res_token.data.get("token")}'}
         payload= {
             'email': 'update@email.com',
             'name': 'Update Name',
             'password': ''
         }
 
-        res = self.client.put(UPDATE_PROFILE_URL, payload, **token, format='json')
-
+        res_user = self.client.put(f'{USER_URL}details/profile/', payload, **token, format='json')
         user = User.objects.get(email__exact=payload['email'])
         serializer = UserSerializer(user, many=False)
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data['id'], serializer.data['id'])
-        self.assertNotEqual(res.data['email'], self.payload['email'])
-
+        self.assertEqual(res_user.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_user.data['id'], serializer.data['id'])
+        self.assertNotEqual(res_user.data['email'], self.payload['email'])
 
     def test_update_user_profile_password_success(self):
         """Test update user profile and password."""
-        res = get_token(self.client.post, self.payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res.data.get("token")}'}
+        res_token = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {res_token.data.get("token")}'}
         payload= {
             'email': 'update@email.com',
             'name': 'Update Name',
             'password': 'password123Updated'
         }
 
-        res = self.client.put(UPDATE_PROFILE_URL, payload, **token, format='json')
+        res_user = self.client.put(f'{USER_URL}details/profile/', payload, **token, format='json')
         user = User.objects.get(email__exact=payload['email'])
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_user.status_code, status.HTTP_200_OK)
         self.assertTrue(user.password, make_password(payload['password']))
-
 
     def test_update_user_profile_with_short_password(self):
         """Test an error is returned if password less than 8 chars."""
-        res = get_token(self.client.post, self.payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {res.data.get("token")}'}
+        res_token = get_token(self.client.post, self.payload)
+        token = {'HTTP_AUTHORIZATION': f'Bearer {res_token.data.get("token")}'}
         payload= {
             'email': 'test_password@mail.com',
             'name': 'Update Name',
             'password': 'short'
         }
 
-        res = self.client.put(UPDATE_PROFILE_URL, payload, **token, format='json')
+        res_user = self.client.put(f'{USER_URL}details/profile/', payload, **token, format='json')
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-
+        self.assertEqual(res_user.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_user_profile_with_invalid_email(self):
         """Test update user profile with an invalid email."""
@@ -175,10 +176,9 @@ class UserAPITests(TestCase):
             'password': ''
         }
 
-        user_update_res = self.client.put(UPDATE_PROFILE_URL, payload, **token, format='json')
+        user_update_res = self.client.put(f'{USER_URL}details/profile/', payload, **token, format='json')
 
         self.assertEqual(user_update_res.status_code, status.HTTP_400_BAD_REQUEST)
-
 
     def test_unathorized_update_user_profile(self):
         """Test unathorized update user profile."""
@@ -187,34 +187,9 @@ class UserAPITests(TestCase):
             'name': 'Update Name',
             'password': ''
         }
-        res = self.client.put(UPDATE_PROFILE_URL, payload, format='json')
+        res = self.client.put(f'{USER_URL}details/profile/', payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
-
-
-    def test_retrieve_user_unathorized(self):
-        """Test authentication is required for user."""
-        res = self.client.get(PROFILE_URL)
-
-        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
-
-
-    def test_retrieve_profile_success(self):
-        """Test retrieving profile for valid token in user."""
-        token_res = get_token(self.client.post, self.payload)
-        token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
-
-        user_profile_res = self.client.get(PROFILE_URL, **token)
-
-        self.assertEqual(user_profile_res.status_code, status.HTTP_200_OK)
-        self.assertEqual(user_profile_res.data, {
-            'id': self.user.id,
-            'username': self.user.username,
-            'email': self.user.email,
-            'name': self.user.first_name,
-            'isAdmin': False
-        })
-
 
     def test_get_user_address(self):
         """Test get address related to user."""
@@ -228,7 +203,7 @@ class UserAPITests(TestCase):
 
         token_res = get_token(self.client.post, self.payload)
         token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
-        user_address_res = self.client.get(GET_USER_ADDRESS, **token)
+        user_address_res = self.client.get(USER_ADDRESS+'retrieve/', **token)
 
         self.assertEqual(user_address_res.status_code, status.HTTP_200_OK)
         self.assertEqual(user_address_res.data['address'], user_address.address)
@@ -239,7 +214,7 @@ class UserAPITests(TestCase):
 
         token_res = get_token(self.client.post, self.payload)
         token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
-        user_address_res = self.client.get(GET_USER_ADDRESS, **token)
+        user_address_res = self.client.get(USER_ADDRESS+'retrieve/', **token)
 
         self.assertEqual(user_address_res.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -253,7 +228,7 @@ class UserAPITests(TestCase):
         }
         token_res = get_token(self.client.post, self.payload)
         token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
-        user_address_res = self.client.post(CREATE_USER_ADDRESS, user_address, **token, format='json')
+        user_address_res = self.client.patch(USER_ADDRESS+'update/', user_address, **token, format='json')
 
         self.assertEqual(user_address_res.status_code, status.HTTP_200_OK)
         self.assertEqual(user_address_res.data['address'], user_address['address'])
@@ -276,7 +251,7 @@ class UserAPITests(TestCase):
 
         token_res = get_token(self.client.post, self.payload)
         token = {'HTTP_AUTHORIZATION': f'Bearer {token_res.data.get("token")}'}
-        user_updated_address_res = self.client.post(CREATE_USER_ADDRESS, updated_user_address, **token, format='json')
+        user_updated_address_res = self.client.patch(USER_ADDRESS+'update/', updated_user_address, **token, format='json')
 
         self.assertEqual(user_updated_address_res.status_code, status.HTTP_200_OK)
         self.assertNotEqual(old_user_address.address, updated_user_address['address'])

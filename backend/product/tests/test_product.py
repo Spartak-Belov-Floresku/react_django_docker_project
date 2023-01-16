@@ -14,10 +14,7 @@ from core.models import Product
 
 from product.serializers import ProductSerializer
 
-
-HTTP_PRODUCTS = '/api/products/'
-HTTP_USER_PRODUCTS = '/api/products/user/reviews'
-
+HTTP_PRODUCTS = '/api/products/user/'
 
 def get_token(path, params):
     """Create and return a token."""
@@ -80,7 +77,7 @@ class ProductAPITests(TestCase):
         self.assertNotEqual(res_products_by_serch.data, serializer.data)
 
     def test_get_product_success(self):
-        """Testing the reciving of a specific product."""
+        """Testing get product by id."""
         res_product_details = self.client.get(f'{HTTP_PRODUCTS}{self.product.id}/')
         serializer = ProductSerializer(self.product, many=False)
 
@@ -88,40 +85,40 @@ class ProductAPITests(TestCase):
         self.assertEqual(res_product_details.data, serializer.data)
 
     def test_get_product_unsuccess(self):
-        """Testing the reciving a product that doesn't exist."""
+        """Testing get product that doesn't exist by id."""
         res_product_details = self.client.get(HTTP_PRODUCTS+'100/')
 
         self.assertEqual(res_product_details.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_create_reveiw_success(self):
+    def test_create_product_reveiw_success(self):
         """Test create user reveiw for a product."""
         reveiw = {'rating': 5}
-        res_product_reveiw = self.client.patch(f'{HTTP_USER_PRODUCTS}/product/{self.product.id}/', reveiw, **self.token, format='json')
+        res_product_reveiw = self.client.patch(f'{HTTP_PRODUCTS}reviews/{self.product.id}/', reveiw, **self.token, format='json')
         product = Product.objects.get(id=self.product.id)
         serializer = ProductSerializer(product, many=False)
 
         self.assertEqual(res_product_reveiw.status_code, status.HTTP_200_OK)
         self.assertEqual(Decimal(reveiw['rating']), Decimal(serializer.data['rating']))
 
-    def test_create_reveiw_unsuccess(self):
-        """Test create the second review to the same product."""
+    def test_create_product_reveiw_unsuccess(self):
+        """Test try to create the second review to the same product."""
         reveiw = {'rating': 5}
-        self.client.patch(f'{HTTP_USER_PRODUCTS}/product/{self.product.id}/', reveiw, **self.token, format='json')
-        res_product_reveiw = self.client.patch(f'{HTTP_USER_PRODUCTS}/product/{self.product.id}/', reveiw, **self.token, format='json')
+        self.client.patch(f'{HTTP_PRODUCTS}reviews/{self.product.id}/', reveiw, **self.token, format='json')
+        res_product_reveiw = self.client.patch(f'{HTTP_PRODUCTS}reviews/{self.product.id}/', reveiw, **self.token, format='json')
 
         self.assertEqual(res_product_reveiw.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual('Product already reviewed!', res_product_reveiw.data['detail'])
 
-    def test_create_reveiw_no_rating_unsuccess(self):
-        """Test create review no rating."""
-        res_product_reveiw = self.client.patch(f'{HTTP_USER_PRODUCTS}/product/{self.product.id}/', {'comment':'No rating'}, **self.token, format='json')
+    def test_create_product_reveiw_no_rating_unsuccess(self):
+        """Test try to create review no rating for a product."""
+        res_product_reveiw = self.client.patch(f'{HTTP_PRODUCTS}reviews/{self.product.id}/', {'comment':'No rating'}, **self.token, format='json')
 
         self.assertEqual(res_product_reveiw.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual('Please select rating!', res_product_reveiw.data['detail'])
 
-    def test_create_reveiw_no_user_unsuccess(self):
-        """Test create review without authentication."""
+    def test_create_product_reveiw_no_user_unsuccess(self):
+        """Test try to create product review without user authentication."""
         reveiw = {'rating': 5}
-        res_product_reveiw = self.client.patch(f'{HTTP_USER_PRODUCTS}/product/{self.product.id}/', reveiw, format='json')
+        res_product_reveiw = self.client.patch(f'{HTTP_PRODUCTS}reviews/{self.product.id}/', reveiw, format='json')
 
         self.assertEqual(res_product_reveiw.status_code, status.HTTP_401_UNAUTHORIZED)

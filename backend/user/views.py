@@ -122,19 +122,19 @@ class UserAddressViewSet(ModelViewSet):
     queryset = UserAddress.objects.all()
     serializer_class = UserAddressSerializer
     permission_classes = (IsAuthenticated,)
-    http_method_names = ['get', 'post',]
+    http_method_names = ['get', 'patch']
 
     def retrieve(self, request, pk=None):
         user = request.user
         try:
-            address = self.queryset.get(user__id=user.id)
+            address = self.queryset.get(user=user)
             serializer = self.serializer_class(address, many=False)
             return Response(serializer.data)
         except:
             message = {'detail': 'The user doesn\'t have an address.'}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-    def create(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
         user = request.user
         data = request.data
         address = self.queryset.filter(user__id=user.id).exists()

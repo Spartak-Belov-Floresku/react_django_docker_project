@@ -11,8 +11,8 @@ app_name = 'user'
 router = DefaultRouter()
 router.register("admin", AdminUserViewSet, basename="admin-user")
 router.register("register", UserRegisterViewSet, basename="register-user")
-router.register("details", UserViewSet, basename="user-details")
-router.register("address", UserAddressViewSet, basename="user-address")
+router.register("details", UserViewSet, basename="details-user")
+router.register("address", UserAddressViewSet, basename="address-user")
 
 urlpatterns = [
     path("login/", MyTokenObtainPairView.as_view(), name='user-token'),
