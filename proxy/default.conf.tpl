@@ -6,7 +6,7 @@ server {
     }
 
     location / {
-        uwsgi_pass ${BACKEND_HOST}:${BACkEND_PORT};
+        uwsgi_pass ${BACKEND_HOST}:${BACKEND_PORT};
         include /etc/nginx/uwsgi_params;
         client_max_body_size 10M;
     }
