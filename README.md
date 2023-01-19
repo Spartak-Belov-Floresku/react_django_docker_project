@@ -21,7 +21,7 @@ The download takes some time. If the app hasn't been used for an hour, the Herok
 - To upload tests products ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py loaddata products"```
 - To create super user ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py createsuperuser"```
 - To start application ```docker-compose -f docker-compose-deploy.yml up```
-- The application will run ```http://http://127.0.0.1:8000/```
+- The application will run on ```http://127.0.0.1:8000/```
 
 <img src="https://raw.githubusercontent.com/Spartak-Belov-Floresku/react_django_docker_project/main/images/third_screen.png">
 
