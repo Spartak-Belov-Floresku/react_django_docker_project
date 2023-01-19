@@ -5,3 +5,4 @@ psycopg2>=2.9.3
 Pillow>=9.2.0
 djangorestframework-simplejwt>=5.2.0
 uwsgi>=2.0.20<2.1
+whitenoise>=6.1.0<6.3.0
