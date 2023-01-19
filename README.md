@@ -20,7 +20,7 @@
 - To run tests ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py test"```
 - To upload tests products ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py loaddata products"```
 - To create super user ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py createsuperuser"```
-- In bash go to frontend and run the commands ```npm install```, ```npm start```
+- To start application ```docker-compose -f docker-compose-deploy.yml up```
 - The application will run ```http://http://127.0.0.1:8000/```
 
 <img src="https://raw.githubusercontent.com/Spartak-Belov-Floresku/react_django_docker_project/main/images/third_screen.png">
