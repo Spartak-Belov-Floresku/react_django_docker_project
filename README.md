@@ -13,10 +13,10 @@
 
 #### To install the application on a local server is necessary.
 - Clone the code.
-- Create ```.env``` file in the top directory and copy the contents of the transfer from ```.env.sample```.
+- Create ```.env``` file in the top directory and copy the contents of the transfer from ```.env.sample```
 - To stop server ```Ctrl+C``` and ```docker-compose -f docker-compose-deploy.yml down```
-- In bash run commands ```docker-compose -f docker-compose-deploy.yml build```. 
-- Applying migrations and collecting static files ```docker-compose -f docker-compose-deploy.yml up```.
+- In bash run commands ```docker-compose -f docker-compose-deploy.yml build``` 
+- Applying migrations and collecting static files ```docker-compose -f docker-compose-deploy.yml up```
 - To run tests ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py test"```
 - To upload tests products ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py loaddata products"```
 - To create super user ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py createsuperuser"```
