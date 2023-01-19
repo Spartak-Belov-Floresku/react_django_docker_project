@@ -1,4 +1,4 @@
-# React/Redux/Django/Python SPA that allows users to simulate e-commerce
+# Docker / React / Redux / Django / Python SPA that allows users to simulate e-commerce
 
 # [GameLand SPA test demo version](https://ambercity-demo.herokuapp.com/)
 
@@ -7,23 +7,24 @@
 - Moreover, it allows you to use it as a real e-commerce if to make some slight changes. 
 - User just needs to regester account and use it as a e-commerce.
 
-<img src="https://raw.githubusercontent.com/Spartak-Belov-Floresku/react_django_docker_project/main/frontend/public/images/first_screen.png">
+<img src="https://raw.githubusercontent.com/Spartak-Belov-Floresku/react_django_docker_project/main/images/first_screen.png">
 
-<img src="https://raw.githubusercontent.com/Spartak-Belov-Floresku/react_django_docker_project/main/frontend/public/images/second_screen.png">
+<img src="https://raw.githubusercontent.com/Spartak-Belov-Floresku/react_django_docker_project/main/images/second_screen.png">
 
 #### To install the application on a local server is necessary.
+- To stop server ```Ctrl+C``` and ```docker-compose -f docker-compose-deploy.yml down```
 - Clone the code.
-- In bash run commands ```docker build .```, ```docker-compose build```, ```docker-compose up```.
-- To run tests ```docker-compose run --rm backend sh -c "python manage.py test"```
-- To upload tests products ```docker-compose run --rm backend sh -c "python manage.py loaddata products"```
-- To create super user ```docker-compose run --rm backend sh -c "python manage.py createsuperuser"```
-- To stop server ```docker-compose down```
+- In bash run commands ```docker-compose -f docker-compose-deploy.yml build```. 
+- To apply migration and collict static files ```docker-compose -f docker-compose-deploy.yml up```.
+- To run tests ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py test"```
+- To upload tests products ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py loaddata products"```
+- To create super user ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py createsuperuser"```
 - In bash go to frontend and run the commands ```npm install```, ```npm start```
-- The application will run on your local server for frontend ```http://localhost:3000``` for a backend  ```http://localhost:8000/admin```
+- The application will run ```http://http://127.0.0.1:8000/```
 
-<img src="https://raw.githubusercontent.com/Spartak-Belov-Floresku/react_django_docker_project/main/frontend/public/images/third_screen.png">
+<img src="https://raw.githubusercontent.com/Spartak-Belov-Floresku/react_django_docker_project/main/images/third_screen.png">
 
-<img src="https://raw.githubusercontent.com/Spartak-Belov-Floresku/react_django_docker_project/main/frontend/public/images/fourth_screen.png">
+<img src="https://raw.githubusercontent.com/Spartak-Belov-Floresku/react_django_docker_project/main/images/fourth_screen.png">
 
 ### Technology used in this project:
 - Django / Python
@@ -33,3 +34,4 @@
 - Bootstrap
 - CSS3
 - HTML5
+- Docker
