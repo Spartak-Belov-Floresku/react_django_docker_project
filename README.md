@@ -19,6 +19,7 @@ The download takes some time. If the app hasn't been used for an hour, the Herok
 - To stop server ```Ctrl+C``` and ```docker-compose -f docker-compose-deploy.yml down```
 - In bash run commands ```docker-compose -f docker-compose-deploy.yml build``` 
 - Applying migrations and collecting static files ```docker-compose -f docker-compose-deploy.yml up```
+- If will get an error ```/docker-entrypoint.sh: exec: line 47: /run.sh: not found``` convert the file ```run.sh``` in editor from ```CRLF``` to ```LF``` in ```\scripts\run.sh``` and ```\proxy\run.sh```. Also re-run command ```docker-compose -f docker-compose-deploy.yml build```.
 - To run tests ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py test"```
 - To upload tests products ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py loaddata products"```
 - To create super user ```docker-compose -f docker-compose-deploy.yml run --rm backend sh -c "python manage.py createsuperuser"```
