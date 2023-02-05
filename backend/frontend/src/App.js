@@ -1,5 +1,5 @@
 import {
-  BrowserRouter as Router,
+  HashRouter,
   Routes,
   Route,
   Navigate
@@ -27,7 +27,7 @@ import OrderListSreen from './screens/OrderListScreen'
 
 function App() {
   return (
-    <Router>
+    <HashRouter>
       <Header/>
       <main className="py-3">
       <Container>
@@ -58,7 +58,7 @@ function App() {
       </Container>
       </main>
       <Footer/>
-    </Router>
+    </HashRouter>
   );
 }
 
