@@ -12,8 +12,7 @@
 
 #### To install the application on a local server is necessary.
 - Clone the code.
-- In bush ```cd backend/frontend```, ```npm install```, and ```npm run build```
-- Go to ```backend/frontend/build/index.html``` and add path to CSS and JS files in header like ```/static/static/code_file.css``` and ```/static/static/code_javascript.js```
+- If you want to run locally, in file ```docker-compose-deploy.yml```, on the row 37 cahnge ```80:8000``` to ```8000:8000```
 - Create ```.env``` file in the top directory and copy the contents of the transfer from ```.env.sample```
 - To stop server ```Ctrl+C``` and ```docker-compose -f docker-compose-deploy.yml down```
 - In bash run commands ```docker-compose -f docker-compose-deploy.yml build``` 
