@@ -1,6 +1,6 @@
 # Docker / React / Redux / Django / Python SPA that allows users to simulate e-commerce
 The download takes some time. If the app hasn't been used for an hour, the Heroku server puts it to sleep.
-# [GameLand SPA test demo version](https://ambercity-demo.herokuapp.com/)
+# [GameLand SPA test demo version](http://ec2-34-232-52-170.compute-1.amazonaws.com/)
 
 - This application was built using Dockerizing, React, and Django. 
 - The application allows the users to simulate e-purchases using the PayPal sandbox. 
