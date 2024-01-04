@@ -1,5 +1,4 @@
 # Docker / React / Redux / Django / Python SPA that allows users to simulate e-commerce
-# [GameLand SPA test demo version](https://deluxe-crisp-486deb.netlify.app/)
 
 - This application was built using Dockerizing, React, and Django. 
 - The application allows the users to simulate e-purchases using the PayPal sandbox. 
